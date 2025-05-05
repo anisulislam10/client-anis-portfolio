@@ -1,46 +1,25 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const blogPosts = [
-  {
-    id: 1,
-    title: 'Getting Started with React Hooks',
-    excerpt: 'Learn how to use React Hooks to simplify your functional components and manage state effectively in modern applications.',
-    date: 'May 15, 2023',
-    readTime: '5 min read',
-    category: 'React',
-    image: 'https://source.unsplash.com/random/600x400/?react,code'
-  },
-  {
-    id: 2,
-    title: 'Building REST APIs with Node.js',
-    excerpt: 'A comprehensive guide to creating robust, scalable REST APIs using Node.js and Express framework.',
-    date: 'April 28, 2023',
-    readTime: '8 min read',
-    category: 'Node.js',
-    image: 'https://source.unsplash.com/random/600x400/?nodejs,backend'
-  },
-  {
-    id: 3,
-    title: 'MongoDB vs SQL: Database Guide',
-    excerpt: 'Detailed comparison between NoSQL and SQL databases to help you choose the right solution for your project.',
-    date: 'March 10, 2023',
-    readTime: '6 min read',
-    category: 'Database',
-    image: 'https://source.unsplash.com/random/600x400/?database,server'
-  },
-  {
-    id: 4,
-    title: 'React Native State Management',
-    excerpt: 'Exploring modern state management solutions for building performant React Native applications.',
-    date: 'February 22, 2023',
-    readTime: '7 min read',
-    category: 'React Native',
-    image: 'https://source.unsplash.com/random/600x400/?mobile,development'
-  },
-];
+
 
 const Blog = () => {
+  const [blogData, setblogData] = useState()
+  useEffect(() => {
+    const fetchData= async()=>{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}blog/get`)
+      setblogData(response.data)
+
+
+    }
+    fetchData()
+  }, [])
+
+  const displayedBlogs= blogData?.slice(0,6)
+
+
   return (
     <section id="blog" className="relative py-28 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Floating 3D elements */}
@@ -96,9 +75,9 @@ const Blog = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {blogPosts.map((post, index) => (
+          {displayedBlogs?.map((post, index) => (
             <motion.div
-              key={post.id}
+              key={post._id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -106,33 +85,46 @@ const Blog = () => {
               className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
             >
               <div className="relative h-60 overflow-hidden">
-                <img 
-                  src={post.image} 
-                  alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+              <img 
+  src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${post.imageUrl}`}
+  alt={post.title}
+  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+/>
+  
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4">
                   <span className="inline-block px-3 py-1 bg-emerald-400/10 text-emerald-400 text-xs font-semibold rounded-full backdrop-blur-sm">
                     {post.category}
+                    
+
                   </span>
                 </div>
               </div>
               
               <div className="p-6">
                 <div className="flex justify-between items-center mb-3 text-sm text-gray-400">
-                  <span>{post.date}</span>
-                  <span>{post.readTime}</span>
+                <span>
+  {new Date(post.createdAt).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })}
+</span>                  {/* <span>{post.readTime}</span> */}
                 </div>
                 
                 <h3 className="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
                   {post.title}
-                </h3>
                 
+                </h3>
+                <div className='text-amber-50'>
+                {post.subtitle}
+                </div>
                 <p className="text-gray-300 mb-5 line-clamp-2">{post.excerpt}</p>
                 
                 <Link
-                  to={`/blog/${post.id}`}
+                  to={`/blog/${post._id}`}
                   className="inline-flex items-center text-emerald-400 font-medium hover:text-emerald-300 transition-colors group/readmore"
                 >
                   Read More

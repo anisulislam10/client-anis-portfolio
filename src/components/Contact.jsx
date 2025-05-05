@@ -76,7 +76,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-5">
                     <h4 className="text-sm font-medium text-gray-400">Email</h4>
-                    <a href="mailto:john@example.com" className="text-lg font-medium text-white hover:text-emerald-400 transition-colors">john@example.com</a>
+                    <a href="mailto:john@example.com" className="text-lg font-medium text-white hover:text-emerald-400 transition-colors">anis.inbox10@gmail.com</a>
                   </div>
                 </div>
                 
@@ -86,7 +86,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-5">
                     <h4 className="text-sm font-medium text-gray-400">Phone</h4>
-                    <a href="tel:+15551234567" className="text-lg font-medium text-white hover:text-emerald-400 transition-colors">+1 (555) 123-4567</a>
+                    <a href="tel:+15551234567" className="text-lg font-medium text-white hover:text-emerald-400 transition-colors">+92 (343) 9275550 </a>
                   </div>
                 </div>
                 
@@ -96,7 +96,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-5">
                     <h4 className="text-sm font-medium text-gray-400">Location</h4>
-                    <p className="text-lg font-medium text-white">San Francisco, CA</p>
+                    <p className="text-lg font-medium text-white">Bahria Town Islamabad, PK</p>
                   </div>
                 </div>
               </div>

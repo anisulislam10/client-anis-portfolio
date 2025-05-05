@@ -1,37 +1,23 @@
 import { FiExternalLink, FiGithub, FiArrowRight } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const projects = [
-  {
-    id: 1,
-    title: 'E-commerce Platform',
-    description: 'A full-featured e-commerce solution with payment integration, inventory management, and analytics dashboard.',
-    technologies: ['React', 'Node.js', 'MongoDB', 'Express', 'Stripe'],
-    image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    link: '#',
-    github: '#'
-  },
-  {
-    id: 2,
-    title: 'Task Management App',
-    description: 'Kanban-style productivity app with real-time collaboration, deadline tracking, and progress analytics.',
-    technologies: ['React', 'Firebase', 'Tailwind CSS', 'DnD Kit'],
-    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    link: '#',
-    github: '#'
-  },
-  {
-    id: 3,
-    title: 'Social Media Dashboard',
-    description: 'Comprehensive analytics platform with customizable widgets, trend prediction, and automated reporting.',
-    technologies: ['React', 'Express', 'PostgreSQL', 'Chart.js', 'D3.js'],
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    link: '#',
-    github: '#'
-  },
-];
 
 const Projects = () => {
+const [project, setproject] = useState()
+  useEffect(() => {
+    const fetchData=async()=>{
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`)
+      setproject(response.data)
+
+    }
+    fetchData()
+  }, [])
+  
+
+  const displayedProjects= project?.slice(0,6)
   return (
     <section id="projects" className="relative py-28 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Floating 3D elements */}
@@ -87,9 +73,9 @@ const Projects = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          {projects.map((project, index) => (
+          {displayedProjects?.map((project, index) => (
             <motion.div
-              key={project.id}
+              key={project._id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -97,11 +83,11 @@ const Projects = () => {
               className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
             >
               <div className="relative h-60 overflow-hidden">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+              <img 
+  src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}`}
+  alt={project.title}
+  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+/>
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4 flex flex-wrap gap-2">
                   {project.technologies.slice(0, 3).map((tech, i) => (
@@ -133,7 +119,7 @@ const Projects = () => {
                 <div className="flex space-x-3">
                   <motion.a
                     whileHover={{ scale: 1.05 }}
-                    href={project.link}
+                    href={project.liveDemoUrl}
                     className="flex-1 flex items-center justify-center px-4 py-2.5 bg-emerald-400/10 text-emerald-400 rounded-lg font-medium hover:bg-emerald-400/20 transition-colors border border-emerald-400/20"
                   >
                     <FiExternalLink className="mr-2" />
@@ -141,7 +127,7 @@ const Projects = () => {
                   </motion.a>
                   <motion.a
                     whileHover={{ scale: 1.05 }}
-                    href={project.github}
+                    href={project.githubUrl}
                     className="flex-1 flex items-center justify-center px-4 py-2.5 bg-white/5 text-gray-300 rounded-lg font-medium hover:bg-white/10 transition-colors border border-white/10"
                   >
                     <FiGithub className="mr-2" />
@@ -163,12 +149,16 @@ const Projects = () => {
           <motion.a
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            href="#"
             className="inline-flex items-center px-8 py-4 text-lg font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-xl hover:shadow-lg transition-all group"
-          >
+          ><Link
+    to="/all-projects"
+    className="inline-flex items-center px-8 py-4 text-lg font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-xl hover:shadow-lg transition-all group"
+  >
             View All Projects
-            <FiArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
+           
+            <FiArrowRight className="ml-2 transition-transform group-hover:translate-x-1" /> </Link>
           </motion.a>
+          
         </motion.div>
       </div>
     </section>

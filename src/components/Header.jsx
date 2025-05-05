@@ -70,7 +70,7 @@ const Header = () => {
               to="/" 
               className="header-logo text-2xl font-bold text-emerald-500 opacity-0 hover:text-emerald-600 transition-colors flex items-center"
             >
-              <span className="font-mono bg-gradient-to-r from-emerald-500 to-cyan-800 bg-clip-text text-transparent">
+              <span className="font-mono bg-gradient-to-r from-emerald-500 to-cyan-800 bg-clip-text text-transparent ">
                 &lt;anisul<span className="text-gray-800">.dev</span>&gt;
               </span>
             </Link>

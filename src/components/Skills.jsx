@@ -45,8 +45,6 @@ const skills = [
   { name: 'Postman', icon: <FaTools className="text-[#ee9d33]" />, category: 'tools' },
   { name: 'VS Code', icon: <VscVscode className="text-[#336eee]" />, category: 'tools' },
   { name: 'Android Studio', icon: <SiAndroidstudio className="text-[#2ad32a]" />, category: 'tools' },
-  { name: 'Firebase', icon: <SiFirebase className="text-[#FFCA28]" />, category: 'backend' },
-  { name: 'GraphQL', icon: <SiGraphql className="text-[#E10098]" />, category: 'backend' }
 ];
 
 const Skills = () => {
