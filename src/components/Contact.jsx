@@ -40,7 +40,7 @@ const Contact = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSubmitStatus({ success: true, message: 'Message sent successfully!' });
+        setSubmitStatus({ success: true, message: 'Your message has been successfully delivered,will respond as soon as possible. anis.dev' });
         setFormData({
           fullname: '',
           email: '',
