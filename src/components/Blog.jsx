@@ -18,7 +18,7 @@ const Blog = () => {
   }, [])
 
   const displayedBlogs= blogData?.slice(0,6)
-
+  
 
   return (
     <section id="blog" className="relative py-28 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
@@ -84,22 +84,7 @@ const Blog = () => {
               viewport={{ once: true }}
               className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
             >
-              <div className="relative h-60 overflow-hidden">
-              <img 
-  src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${post.imageUrl}`}
-  alt={post.title}
-  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-/>
-  
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                <div className="absolute top-4 right-4">
-                  <span className="inline-block px-3 py-1 bg-emerald-400/10 text-emerald-400 text-xs font-semibold rounded-full backdrop-blur-sm">
-                    {post.category}
-                    
-
-                  </span>
-                </div>
-              </div>
+            
               
               <div className="p-6">
                 <div className="flex justify-between items-center mb-3 text-sm text-gray-400">

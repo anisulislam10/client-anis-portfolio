@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, Select, Table, Space, Modal, message } from 'antd';
-import { UploadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Select, Table, Space, Modal, message } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { TextArea } = Input;
@@ -10,15 +10,8 @@ const Blogs = () => {
   const [form] = Form.useForm();
   const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([
-    'technology',
-    'programming',
-    'design',
-    'business',
-    'lifestyle'
-  ]);
+  const [categories] = useState(['Technology', 'Business', 'Design', 'Marketing']);
 
   // API base URL
   const API_BASE = `${import.meta.env.VITE_BASE_URL}blog`;
@@ -32,10 +25,11 @@ const Blogs = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get`);
-      setBlogs(response.data);
+      setBlogs(response.data || []); 
     } catch (error) {
       message.error('Failed to fetch blogs');
       console.error('Error fetching blogs:', error);
+          setBlogs([]); 
     } finally {
       setLoading(false);
     }
@@ -48,10 +42,14 @@ const Blogs = () => {
       key: 'title',
     },
     {
+      title: 'Subtitle',
+      dataIndex: 'subTitle',
+      key: 'subTitle',
+    },
+    {
       title: 'Category',
       dataIndex: 'category',
       key: 'category',
-      render: (category) => category.charAt(0).toUpperCase() + category.slice(1),
     },
     {
       title: 'Actions',
@@ -80,34 +78,13 @@ const Blogs = () => {
     try {
       setLoading(true);
       
-      const formData = new FormData();
-      
-      // Append all form values
-      formData.append('title', values.title);
-      formData.append('subTitle', values.subTitle);
-      formData.append('description', values.description);
-      formData.append('category', values.category);
-      
-      // Append image file if exists
-      if (fileList[0]?.originFileObj) {
-        formData.append('image', fileList[0].originFileObj);
-      }
-
       if (editingId) {
         // Update existing blog
-        await axios.put(`${API_BASE}/update/${editingId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axios.put(`${API_BASE}/update/${editingId}`, values);
         message.success('Blog updated successfully');
       } else {
         // Add new blog
-        await axios.post(`${API_BASE}/post`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axios.post(`${API_BASE}/post`, values);
         message.success('Blog added successfully');
       }
 
@@ -123,7 +100,6 @@ const Blogs = () => {
 
   const resetForm = () => {
     form.resetFields();
-    setFileList([]);
     setEditingId(null);
   };
 
@@ -141,14 +117,6 @@ const Blogs = () => {
           category: blog.category
         });
         setEditingId(id);
-        if (blog.imageUrl) {
-          setFileList([{
-            uid: '-1',
-            name: 'current-image',
-            status: 'done',
-            url: `${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${blog.imageUrl}`,
-          }]);
-        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -171,7 +139,6 @@ const Blogs = () => {
           setLoading(true);
           await axios.delete(`${API_BASE}/delete/${id}`);
           message.success('Blog deleted successfully');
-          // Optimistically update the UI
           setBlogs(blogs.filter(blog => blog._id !== id));
         } catch (error) {
           message.error('Failed to delete blog');
@@ -183,12 +150,8 @@ const Blogs = () => {
     });
   };
 
-  const onUploadChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
-
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       <h2>{editingId ? 'Edit Blog' : 'Add New Blog'}</h2>
       <Form
         form={form}
@@ -220,29 +183,10 @@ const Blogs = () => {
           <Select placeholder="Select category">
             {categories.map(category => (
               <Select.Option key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {category}
               </Select.Option>
             ))}
           </Select>
-        </Form.Item>
-        
-        <Form.Item label="Featured Image">
-          <Upload
-            name="image"
-            listType="picture-card"
-            fileList={fileList}
-            onChange={onUploadChange}
-            beforeUpload={() => false}
-            maxCount={1}
-            accept="image/*"
-          >
-            {fileList.length >= 1 ? null : (
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Upload</div>
-              </div>
-            )}
-          </Upload>
         </Form.Item>
         
         <Form.Item 
@@ -271,24 +215,23 @@ const Blogs = () => {
         </Form.Item>
       </Form>
 
-      <div style={{ marginTop: 32 }}>
-        <h2>Your Blogs</h2>
-        <Table 
-          columns={columns} 
-          dataSource={blogs} 
-          rowKey="_id"
-          loading={loading}
-          pagination={{ 
-            pageSize: 5,
-            showSizeChanger: false,
-            hideOnSinglePage: true
-          }}
-          locale={{
-            emptyText: 'No blogs found'
-          }}
-          scroll={{ x: true }}
-        />
-      </div>
+      <div style={{ marginTop: '40px' }}>
+  <h2>Your Blogs</h2>
+  <Table 
+    columns={columns} 
+    dataSource={Array.isArray(blogs) ? blogs : []} 
+    rowKey="_id"
+    loading={loading}
+    pagination={{ 
+      pageSize: 5,
+      showSizeChanger: false,
+      hideOnSinglePage: true
+    }}
+    locale={{
+      emptyText: 'No blogs found'
+    }}
+  />
+</div>
     </div>
   );
 };

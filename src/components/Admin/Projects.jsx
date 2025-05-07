@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, Select, Table, Space, Modal, message, Switch, Image } from 'antd';
-import { UploadOutlined, EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Select, Table, Space, Modal, message, Switch } from 'antd';
+import { EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { TextArea } = Input;
@@ -10,7 +10,6 @@ const Projects = () => {
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const API_BASE = `${import.meta.env.VITE_BASE_URL}project`;
@@ -23,8 +22,7 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get`);
-      // Handle both response formats (response.data.projects or response.data)
-      const projectsData = response.data.projects || response.data || [];
+      const projectsData = response.data.data || response.data || [];
       setProjects(projectsData);
     } catch (error) {
       message.error('Failed to fetch projects');
@@ -35,21 +33,6 @@ const Projects = () => {
   };
 
   const columns = [
-    {
-      title: 'Image',
-      dataIndex: 'imageUrl',
-      key: 'image',
-      render: (url) => (
-        <Image
-          src={url}
-          alt="Project thumbnail"
-          width={50}
-          height={50}
-          style={{ objectFit: 'cover' }}
-          fallback="https://via.placeholder.com/50"
-        />
-      )
-    },
     {
       title: 'Title',
       dataIndex: 'title',
@@ -65,19 +48,7 @@ const Projects = () => {
       title: 'Technologies',
       dataIndex: 'technologies',
       key: 'technologies',
-      render: (techs) => (Array.isArray(techs) ? techs.join(', ') : techs),
-      filters: [
-        { text: 'React', value: 'React' },
-        { text: 'Node.js', value: 'Node.js' },
-        { text: 'MongoDB', value: 'MongoDB' },
-        { text: 'Express', value: 'Express' }
-      ],
-      onFilter: (value, record) => {
-        const techs = Array.isArray(record.technologies) ? 
-          record.technologies : 
-          JSON.parse(record.technologies.replace(/'/g, '"'));
-        return techs.includes(value);
-      }
+      render: (techs) => (Array.isArray(techs) ? techs.join(', ') : techs)
     },
     {
       title: 'Featured',
@@ -90,12 +61,7 @@ const Projects = () => {
           checkedChildren={<StarOutlined />}
           unCheckedChildren={<StarOutlined />}
         />
-      ),
-      filters: [
-        { text: 'Featured', value: true },
-        { text: 'Not Featured', value: false }
-      ],
-      onFilter: (value, record) => record.featured === value
+      )
     },
     {
       title: 'Actions',
@@ -106,14 +72,12 @@ const Projects = () => {
             type="text" 
             icon={<EditOutlined />} 
             onClick={() => handleEdit(record._id)}
-            disabled={loading}
           />
           <Button 
             type="text" 
             danger 
             icon={<DeleteOutlined />} 
             onClick={() => handleDelete(record._id)}
-            disabled={loading}
           />
         </Space>
       ),
@@ -134,33 +98,22 @@ const Projects = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      const formData = new FormData();
-
-      formData.append('title', values.title);
-      formData.append('subtitle', values.subtitle);
-      formData.append('description', values.description);
-      formData.append('technologies', JSON.stringify(values.technologies || []));
-      formData.append('featured', values.featured || false);
-      formData.append('githubUrl', values.githubUrl || '');
-      formData.append('liveDemoUrl', values.liveDemoUrl || '');
-
-      if (fileList[0]?.originFileObj) {
-        formData.append('image', fileList[0].originFileObj);
-      }
+      
+      const projectData = {
+        title: values.title,
+        subtitle: values.subtitle,
+        description: values.description,
+        technologies: values.technologies || [],
+        featured: values.featured || false,
+        githubUrl: values.githubUrl || '',
+        liveDemoUrl: values.liveDemoUrl || ''
+      };
 
       if (editingId) {
-        await axios.put(`${API_BASE}/update/${editingId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axios.put(`${API_BASE}/update/${editingId}`, projectData);
         message.success('Project updated successfully');
       } else {
-        await axios.post(`${API_BASE}/post`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axios.post(`${API_BASE}/post`, projectData);
         message.success('Project added successfully');
       }
 
@@ -176,7 +129,6 @@ const Projects = () => {
 
   const resetForm = () => {
     form.resetFields();
-    setFileList([]);
     setEditingId(null);
   };
 
@@ -191,27 +143,9 @@ const Projects = () => {
           ...project,
           technologies: Array.isArray(project.technologies) ? 
             project.technologies : 
-            JSON.parse(project.technologies.replace(/'/g, '"')) || [],
-          featured: project.featured || false,
-          githubUrl: project.githubUrl || '',
-          liveDemoUrl: project.liveDemoUrl || ''
+            JSON.parse(project.technologies.replace(/'/g, '"')) || []
         });
-
         setEditingId(id);
-
-        if (project.imageUrl) {
-          const imageUrl = new URL(
-            `/public${project.imageUrl}`, 
-            import.meta.env.VITE_BASE_URL.replace('/api/v1/', '/')
-          ).toString();
-          setFileList([{
-            uid: '-1',
-            name: 'current-image',
-            status: 'done',
-            url: imageUrl,
-          }]);
-        }
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -255,7 +189,6 @@ const Projects = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        disabled={loading}
         style={{ maxWidth: '800px' }}
       >
         <Form.Item 
@@ -304,39 +237,6 @@ const Projects = () => {
         </Form.Item>
 
         <Form.Item 
-          label="Project Image"
-          name="image"
-          valuePropName="fileList"
-          getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
-          rules={[
-            {
-              validator: (_, value) => {
-                if (!fileList.length) {
-                  return Promise.reject('Please upload a project image');
-                }
-                return Promise.resolve();
-              }
-            }
-          ]}
-        >
-          <Upload
-            listType="picture-card"
-            fileList={fileList}
-            onChange={({ fileList }) => setFileList(fileList)}
-            beforeUpload={() => false}
-            maxCount={1}
-            accept="image/*"
-          >
-            {fileList.length >= 1 ? null : (
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Upload</div>
-              </div>
-            )}
-          </Upload>
-        </Form.Item>
-
-        <Form.Item 
           label="GitHub URL" 
           name="githubUrl"
           rules={[{ type: 'url', message: 'Please enter a valid URL' }]}
@@ -365,7 +265,6 @@ const Projects = () => {
             {editingId && (
               <Button 
                 onClick={resetForm} 
-                disabled={loading}
                 size="large"
               >
                 Cancel
@@ -390,7 +289,6 @@ const Projects = () => {
           locale={{
             emptyText: 'No projects found'
           }}
-          scroll={{ x: true }}
           bordered
         />
       </div>
