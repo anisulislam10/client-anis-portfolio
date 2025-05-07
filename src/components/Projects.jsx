@@ -4,29 +4,51 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-
 const Projects = () => {
-const [project, setproject] = useState()
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const fetchData=async()=>{
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`)
-      setproject(response.data.projects)
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`);
+        setProjects(response.data.projects || response.data || []);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-    }
-    fetchData()
-  }, [])
-  
+  const displayedProjects = projects?.slice(0, 6);
 
-  const displayedProjects= project?.slice(0,6)
+  // Function to properly format image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${imagePath}`;
+  };
+
+  if (loading) {
+    return (
+      <section id="projects" className="relative py-28 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-white">Loading projects...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="projects" className="relative py-28 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Floating 3D elements */}
+      {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl"></div>
         <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-emerald-600/10 rounded-full filter blur-3xl"></div>
       </div>
 
-      {/* Animated grid background */}
       <div className="absolute inset-0 opacity-5 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]">
         <div className="absolute inset-0 bg-[size:20px_20px] [background-image:linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]"></div>
       </div>
@@ -83,17 +105,17 @@ const [project, setproject] = useState()
               className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
             >
               <div className="relative h-60 overflow-hidden">
-              <img 
-  src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}`}
-  alt={project.title}
-  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-/>
-{
-  console.log("image----",`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}` )
-}
+                <img 
+                  src={getImageUrl(project.imageUrl)}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onError={(e) => {
+                    e.target.src = '';
+                  }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4 flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 3).map((tech, i) => (
+                  {project.technologies?.slice(0, 3).map((tech, i) => (
                     <span key={i} className="px-2 py-1 bg-emerald-400/10 text-emerald-400 text-xs font-semibold rounded-full backdrop-blur-sm">
                       {tech}
                     </span>
@@ -109,7 +131,7 @@ const [project, setproject] = useState()
                 <p className="text-gray-300 mb-5">{project.description}</p>
                 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {project.technologies.map((tech, index) => (
+                  {project.technologies?.map((tech, index) => (
                     <span 
                       key={index} 
                       className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 backdrop-blur-sm"
@@ -120,22 +142,30 @@ const [project, setproject] = useState()
                 </div>
                 
                 <div className="flex space-x-3">
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    href={project.liveDemoUrl}
-                    className="flex-1 flex items-center justify-center px-4 py-2.5 bg-emerald-400/10 text-emerald-400 rounded-lg font-medium hover:bg-emerald-400/20 transition-colors border border-emerald-400/20"
-                  >
-                    <FiExternalLink className="mr-2" />
-                    Live Demo
-                  </motion.a>
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    href={project.githubUrl}
-                    className="flex-1 flex items-center justify-center px-4 py-2.5 bg-white/5 text-gray-300 rounded-lg font-medium hover:bg-white/10 transition-colors border border-white/10"
-                  >
-                    <FiGithub className="mr-2" />
-                    Code
-                  </motion.a>
+                  {project.liveDemoUrl && (
+                    <motion.a
+                      whileHover={{ scale: 1.05 }}
+                      href={project.liveDemoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center px-4 py-2.5 bg-emerald-400/10 text-emerald-400 rounded-lg font-medium hover:bg-emerald-400/20 transition-colors border border-emerald-400/20"
+                    >
+                      <FiExternalLink className="mr-2" />
+                      Live Demo
+                    </motion.a>
+                  )}
+                  {project.githubUrl && (
+                    <motion.a
+                      whileHover={{ scale: 1.05 }}
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center px-4 py-2.5 bg-white/5 text-gray-300 rounded-lg font-medium hover:bg-white/10 transition-colors border border-white/10"
+                    >
+                      <FiGithub className="mr-2" />
+                      Code
+                    </motion.a>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -149,19 +179,13 @@ const [project, setproject] = useState()
           viewport={{ once: true }}
           className="text-center"
         >
-          <motion.a
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <Link
+            to="/all-projects"
             className="inline-flex items-center px-8 py-4 text-lg font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-xl hover:shadow-lg transition-all group"
-          ><Link
-    to="/all-projects"
-    className="inline-flex items-center px-8 py-4 text-lg font-bold text-gray-900 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-xl hover:shadow-lg transition-all group"
-  >
+          >
             View All Projects
-           
-            <FiArrowRight className="ml-2 transition-transform group-hover:translate-x-1" /> </Link>
-          </motion.a>
-          
+            <FiArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
+          </Link>
         </motion.div>
       </div>
     </section>

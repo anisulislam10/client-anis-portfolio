@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, Select, Table, Space, Modal, message, Switch } from 'antd';
+import { Form, Input, Button, Upload, Select, Table, Space, Modal, message, Switch, Image } from 'antd';
 import { UploadOutlined, EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -12,7 +12,6 @@ const Projects = () => {
   const [editingId, setEditingId] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [rawData, setRawData] = useState([]); // initial empty array
 
   const API_BASE = `${import.meta.env.VITE_BASE_URL}project`;
 
@@ -24,8 +23,9 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get`);
-      setProjects(response.data.projects);
-      setRawData([]); // fallback
+      // Handle both response formats (response.data.projects or response.data)
+      const projectsData = response.data.projects || response.data || [];
+      setProjects(projectsData);
     } catch (error) {
       message.error('Failed to fetch projects');
       console.error('Error fetching projects:', error);
@@ -36,20 +36,48 @@ const Projects = () => {
 
   const columns = [
     {
+      title: 'Image',
+      dataIndex: 'imageUrl',
+      key: 'image',
+      render: (url) => (
+        <Image
+          src={url}
+          alt="Project thumbnail"
+          width={50}
+          height={50}
+          style={{ objectFit: 'cover' }}
+          fallback="https://via.placeholder.com/50"
+        />
+      )
+    },
+    {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
+      sorter: (a, b) => a.title.localeCompare(b.title)
     },
     {
       title: 'Subtitle',
       dataIndex: 'subtitle',
-      key: 'subtitle',
+      key: 'subtitle'
     },
     {
       title: 'Technologies',
       dataIndex: 'technologies',
       key: 'technologies',
-      render: (techs) => techs?.join(', ') || '-',
+      render: (techs) => (Array.isArray(techs) ? techs.join(', ') : techs),
+      filters: [
+        { text: 'React', value: 'React' },
+        { text: 'Node.js', value: 'Node.js' },
+        { text: 'MongoDB', value: 'MongoDB' },
+        { text: 'Express', value: 'Express' }
+      ],
+      onFilter: (value, record) => {
+        const techs = Array.isArray(record.technologies) ? 
+          record.technologies : 
+          JSON.parse(record.technologies.replace(/'/g, '"'));
+        return techs.includes(value);
+      }
     },
     {
       title: 'Featured',
@@ -63,6 +91,11 @@ const Projects = () => {
           unCheckedChildren={<StarOutlined />}
         />
       ),
+      filters: [
+        { text: 'Featured', value: true },
+        { text: 'Not Featured', value: false }
+      ],
+      onFilter: (value, record) => record.featured === value
     },
     {
       title: 'Actions',
@@ -108,8 +141,8 @@ const Projects = () => {
       formData.append('description', values.description);
       formData.append('technologies', JSON.stringify(values.technologies || []));
       formData.append('featured', values.featured || false);
-      formData.append('githubUrl', values.githubUrl);
-      formData.append('liveDemoUrl', values.liveDemoUrl);
+      formData.append('githubUrl', values.githubUrl || '');
+      formData.append('liveDemoUrl', values.liveDemoUrl || '');
 
       if (fileList[0]?.originFileObj) {
         formData.append('image', fileList[0].originFileObj);
@@ -151,12 +184,14 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get/${id}`);
-      const project = response.data.projects;
+      const project = response.data.projects || response.data;
 
       if (project) {
         form.setFieldsValue({
           ...project,
-          technologies: project.technologies || [],
+          technologies: Array.isArray(project.technologies) ? 
+            project.technologies : 
+            JSON.parse(project.technologies.replace(/'/g, '"')) || [],
           featured: project.featured || false,
           githubUrl: project.githubUrl || '',
           liveDemoUrl: project.liveDemoUrl || ''
@@ -165,7 +200,10 @@ const Projects = () => {
         setEditingId(id);
 
         if (project.imageUrl) {
-          const imageUrl = new URL(`/public${project.imageUrl}`, import.meta.env.VITE_BASE_URL.replace('/api/v1/', '/')).toString();
+          const imageUrl = new URL(
+            `/public${project.imageUrl}`, 
+            import.meta.env.VITE_BASE_URL.replace('/api/v1/', '/')
+          ).toString();
           setFileList([{
             uid: '-1',
             name: 'current-image',
@@ -194,14 +232,9 @@ const Projects = () => {
       onOk: async () => {
         try {
           setLoading(true);
-          const response = await axios.delete(`${API_BASE}/delete/${id}`);
-
-          if (response.status === 200 || response.status === 204) {
-            message.success('Project deleted successfully');
-            setProjects(prev => prev.filter(p => p._id !== id));
-          } else {
-            throw new Error('Failed to delete project');
-          }
+          await axios.delete(`${API_BASE}/delete/${id}`);
+          message.success('Project deleted successfully');
+          setProjects(prev => prev.filter(p => p._id !== id));
         } catch (error) {
           message.error(error.response?.data?.message || 'Failed to delete project');
           console.error('Delete error:', error);
@@ -213,13 +246,17 @@ const Projects = () => {
   };
 
   return (
-    <div>
-      <h2>{editingId ? 'Edit Project' : 'Add New Project'}</h2>
+    <div style={{ padding: '24px' }}>
+      <h2 style={{ marginBottom: '24px' }}>
+        {editingId ? 'Edit Project' : 'Add New Project'}
+      </h2>
+      
       <Form
         form={form}
         layout="vertical"
         onFinish={onFinish}
         disabled={loading}
+        style={{ maxWidth: '800px' }}
       >
         <Form.Item 
           label="Project Title" 
@@ -253,8 +290,8 @@ const Projects = () => {
           <Select
             mode="tags"
             style={{ width: '100%' }}
-            placeholder="Add technologies"
-            tokenSeparators={[',', ' ']}
+            placeholder="Add technologies (press enter to add)"
+            tokenSeparators={[',']}
           />
         </Form.Item>
 
@@ -268,8 +305,19 @@ const Projects = () => {
 
         <Form.Item 
           label="Project Image"
+          name="image"
           valuePropName="fileList"
           getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
+          rules={[
+            {
+              validator: (_, value) => {
+                if (!fileList.length) {
+                  return Promise.reject('Please upload a project image');
+                }
+                return Promise.resolve();
+              }
+            }
+          ]}
         >
           <Upload
             listType="picture-card"
@@ -306,11 +354,20 @@ const Projects = () => {
 
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading}
+              size="large"
+            >
               {editingId ? 'Update Project' : 'Add Project'}
             </Button>
             {editingId && (
-              <Button onClick={resetForm} disabled={loading}>
+              <Button 
+                onClick={resetForm} 
+                disabled={loading}
+                size="large"
+              >
                 Cancel
               </Button>
             )}
@@ -318,10 +375,24 @@ const Projects = () => {
         </Form.Item>
       </Form>
 
-      <div style={{ marginTop: 32 }}>
-        <h2>Your Projects</h2>
-        <Table dataSource={Array.isArray(projects) ? rawData : []} columns={columns} />
-
+      <div style={{ marginTop: '40px' }}>
+        <h2 style={{ marginBottom: '16px' }}>Your Projects</h2>
+        <Table
+          columns={columns}
+          dataSource={projects}
+          rowKey="_id"
+          loading={loading}
+          pagination={{ 
+            pageSize: 5,
+            showSizeChanger: false,
+            hideOnSinglePage: true
+          }}
+          locale={{
+            emptyText: 'No projects found'
+          }}
+          scroll={{ x: true }}
+          bordered
+        />
       </div>
     </div>
   );

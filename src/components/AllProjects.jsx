@@ -14,7 +14,7 @@ const AllProjects = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`);
-        setProjects(response.data);
+        setProjects(response.data.projects);
       } catch (err) {
         setError(err.message || 'Failed to fetch projects');
       } finally {
@@ -56,7 +56,12 @@ const AllProjects = () => {
       </section>
     );
   }
-
+ // Function to properly format image URL
+ const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${imagePath}`;
+};
   return (
     <section id="all-projects" className="relative py-28 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Floating 3D elements */}
@@ -195,11 +200,14 @@ const AllProjects = () => {
                 className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
               >
                 <div className="relative h-60 overflow-hidden">
-                  <img 
-                    src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}`}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                <img 
+                  src={getImageUrl(project.imageUrl)}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onError={(e) => {
+                    e.target.src = '';
+                  }}
+                />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
                 </div>
                 
