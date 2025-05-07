@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Table, Space, Modal, message, Switch } from 'antd';
-import { EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
-const { TextArea } = Input;
-const { confirm } = Modal;
-
 const Projects = () => {
-  const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    subtitle: '',
+    description: '',
+    technologies: [],
+    featured: false,
+    githubUrl: '',
+    liveDemoUrl: ''
+  });
 
   const API_BASE = `${import.meta.env.VITE_BASE_URL}project`;
 
@@ -22,105 +25,42 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get`);
-      const projectsData = response.data.data || response.data || [];
-      setProjects(projectsData);
+      setProjects(response.data.data || response.data || []);
     } catch (error) {
-      message.error('Failed to fetch projects');
+      alert('Failed to fetch projects');
       console.error('Error fetching projects:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      sorter: (a, b) => a.title.localeCompare(b.title)
-    },
-    {
-      title: 'Subtitle',
-      dataIndex: 'subtitle',
-      key: 'subtitle'
-    },
-    {
-      title: 'Technologies',
-      dataIndex: 'technologies',
-      key: 'technologies',
-      render: (techs) => (Array.isArray(techs) ? techs.join(', ') : techs)
-    },
-    {
-      title: 'Featured',
-      dataIndex: 'featured',
-      key: 'featured',
-      render: (featured, record) => (
-        <Switch
-          checked={featured}
-          onChange={(checked) => handleToggleFeatured(record._id, checked)}
-          checkedChildren={<StarOutlined />}
-          unCheckedChildren={<StarOutlined />}
-        />
-      )
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
-            onClick={() => handleEdit(record._id)}
-          />
-          <Button 
-            type="text" 
-            danger 
-            icon={<DeleteOutlined />} 
-            onClick={() => handleDelete(record._id)}
-          />
-        </Space>
-      ),
-    },
-  ];
-
-  const handleToggleFeatured = async (id, featured) => {
-    try {
-      await axios.patch(`${API_BASE}/update/${id}`, { featured });
-      message.success(`Project ${featured ? 'marked as featured' : 'removed from featured'}`);
-      fetchProjects();
-    } catch (error) {
-      message.error('Failed to update featured status');
-      console.error('Error updating featured status:', error);
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const onFinish = async (values) => {
+  const handleTechChange = (e) => {
+    const techs = e.target.value.split(',').map(t => t.trim());
+    setFormData(prev => ({ ...prev, technologies: techs }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true);
       
-      const projectData = {
-        title: values.title,
-        subtitle: values.subtitle,
-        description: values.description,
-        technologies: values.technologies || [],
-        featured: values.featured || false,
-        githubUrl: values.githubUrl || '',
-        liveDemoUrl: values.liveDemoUrl || ''
-      };
-
       if (editingId) {
-        await axios.put(`${API_BASE}/update/${editingId}`, projectData);
-        message.success('Project updated successfully');
+        await axios.put(`${API_BASE}/update/${editingId}`, formData);
+        alert('Project updated successfully');
       } else {
-        await axios.post(`${API_BASE}/post`, projectData);
-        message.success('Project added successfully');
+        await axios.post(`${API_BASE}/post`, formData);
+        alert('Project added successfully');
       }
 
       resetForm();
       fetchProjects();
     } catch (error) {
-      message.error(error.response?.data?.message || 'Operation failed');
+      alert(error.response?.data?.message || 'Operation failed');
       console.error('Error saving project:', error);
     } finally {
       setLoading(false);
@@ -128,7 +68,15 @@ const Projects = () => {
   };
 
   const resetForm = () => {
-    form.resetFields();
+    setFormData({
+      title: '',
+      subtitle: '',
+      description: '',
+      technologies: [],
+      featured: false,
+      githubUrl: '',
+      liveDemoUrl: ''
+    });
     setEditingId(null);
   };
 
@@ -139,17 +87,22 @@ const Projects = () => {
       const project = response.data.projects || response.data;
 
       if (project) {
-        form.setFieldsValue({
-          ...project,
+        setFormData({
+          title: project.title,
+          subtitle: project.subtitle,
+          description: project.description,
           technologies: Array.isArray(project.technologies) ? 
             project.technologies : 
-            JSON.parse(project.technologies.replace(/'/g, '"')) || []
+            JSON.parse(project.technologies.replace(/'/g, '"')) || [],
+          featured: project.featured || false,
+          githubUrl: project.githubUrl || '',
+          liveDemoUrl: project.liveDemoUrl || ''
         });
         setEditingId(id);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
-      message.error('Failed to load project for editing');
+      alert('Failed to load project for editing');
       console.error('Error editing project:', error);
     } finally {
       setLoading(false);
@@ -157,140 +110,173 @@ const Projects = () => {
   };
 
   const handleDelete = async (id) => {
-    confirm({
-      title: 'Are you sure you want to delete this project?',
-      content: 'This action cannot be undone',
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          setLoading(true);
-          await axios.delete(`${API_BASE}/delete/${id}`);
-          message.success('Project deleted successfully');
-          setProjects(prev => prev.filter(p => p._id !== id));
-        } catch (error) {
-          message.error(error.response?.data?.message || 'Failed to delete project');
-          console.error('Delete error:', error);
-        } finally {
-          setLoading(false);
-        }
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        setLoading(true);
+        await axios.delete(`${API_BASE}/delete/${id}`);
+        alert('Project deleted successfully');
+        setProjects(prev => prev.filter(p => p._id !== id));
+      } catch (error) {
+        alert('Failed to delete project');
+        console.error('Delete error:', error);
+      } finally {
+        setLoading(false);
       }
-    });
+    }
+  };
+
+  const toggleFeatured = async (id, featured) => {
+    try {
+      await axios.patch(`${API_BASE}/update/${id}`, { featured });
+      fetchProjects();
+    } catch (error) {
+      alert('Failed to update featured status');
+      console.error('Error updating featured status:', error);
+    }
   };
 
   return (
-    <div style={{ padding: '24px' }}>
-      <h2 style={{ marginBottom: '24px' }}>
-        {editingId ? 'Edit Project' : 'Add New Project'}
-      </h2>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+      <h2>{editingId ? 'Edit Project' : 'Add New Project'}</h2>
       
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        style={{ maxWidth: '800px' }}
-      >
-        <Form.Item 
-          label="Project Title" 
-          name="title"
-          rules={[{ required: true, message: 'Please enter project title' }]}
-        >
-          <Input placeholder="Enter project title" />
-        </Form.Item>
-
-        <Form.Item 
-          label="Project Subtitle" 
-          name="subtitle"
-          rules={[{ required: true, message: 'Please enter project subtitle' }]}
-        >
-          <Input placeholder="Enter project subtitle" />
-        </Form.Item>
-
-        <Form.Item 
-          label="Description" 
-          name="description"
-          rules={[{ required: true, message: 'Please enter project description' }]}
-        >
-          <TextArea rows={4} placeholder="Enter project description" />
-        </Form.Item>
-
-        <Form.Item 
-          label="Technologies" 
-          name="technologies"
-          rules={[{ required: true, message: 'Please add at least one technology' }]}
-        >
-          <Select
-            mode="tags"
-            style={{ width: '100%' }}
-            placeholder="Add technologies (press enter to add)"
-            tokenSeparators={[',']}
+      <form onSubmit={handleSubmit} style={{ marginBottom: '40px' }}>
+        <div style={{ marginBottom: '15px' }}>
+          <label>Project Title</label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            required
+            style={{ width: '100%', padding: '8px' }}
           />
-        </Form.Item>
+        </div>
 
-        <Form.Item 
-          label="Featured Project" 
-          name="featured"
-          valuePropName="checked"
-        >
-          <Switch checkedChildren="Yes" unCheckedChildren="No" />
-        </Form.Item>
+        <div style={{ marginBottom: '15px' }}>
+          <label>Project Subtitle</label>
+          <input
+            type="text"
+            name="subtitle"
+            value={formData.subtitle}
+            onChange={handleInputChange}
+            required
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
 
-        <Form.Item 
-          label="GitHub URL" 
-          name="githubUrl"
-          rules={[{ type: 'url', message: 'Please enter a valid URL' }]}
-        >
-          <Input placeholder="https://github.com/username/project" />
-        </Form.Item>
+        <div style={{ marginBottom: '15px' }}>
+          <label>Description</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            required
+            rows="4"
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
 
-        <Form.Item 
-          label="Live Project URL" 
-          name="liveDemoUrl"
-          rules={[{ type: 'url', message: 'Please enter a valid URL' }]}
-        >
-          <Input placeholder="https://yourproject.com" />
-        </Form.Item>
+        <div style={{ marginBottom: '15px' }}>
+          <label>Technologies (comma separated)</label>
+          <input
+            type="text"
+            value={formData.technologies.join(', ')}
+            onChange={handleTechChange}
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
 
-        <Form.Item>
-          <Space>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading}
-              size="large"
-            >
-              {editingId ? 'Update Project' : 'Add Project'}
-            </Button>
-            {editingId && (
-              <Button 
-                onClick={resetForm} 
-                size="large"
-              >
-                Cancel
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
-      </Form>
+        <div style={{ marginBottom: '15px' }}>
+          <label>
+            <input
+              type="checkbox"
+              name="featured"
+              checked={formData.featured}
+              onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+            />
+            Featured Project
+          </label>
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label>GitHub URL</label>
+          <input
+            type="url"
+            name="githubUrl"
+            value={formData.githubUrl}
+            onChange={handleInputChange}
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label>Live Project URL</label>
+          <input
+            type="url"
+            name="liveDemoUrl"
+            value={formData.liveDemoUrl}
+            onChange={handleInputChange}
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
+
+        <div>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Processing...' : editingId ? 'Update Project' : 'Add Project'}
+          </button>
+          {editingId && (
+            <button type="button" onClick={resetForm}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
 
       <div style={{ marginTop: '40px' }}>
-        <h2 style={{ marginBottom: '16px' }}>Your Projects</h2>
-        <Table
-          columns={columns}
-          dataSource={projects}
-          rowKey="_id"
-          loading={loading}
-          pagination={{ 
-            pageSize: 5,
-            showSizeChanger: false,
-            hideOnSinglePage: true
-          }}
-          locale={{
-            emptyText: 'No projects found'
-          }}
-          bordered
-        />
+        <h2>Your Projects</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : projects.length === 0 ? (
+          <p>No projects found</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #ddd' }}>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Title</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Subtitle</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Technologies</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Featured</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map(project => (
+                  <tr key={project._id} style={{ borderBottom: '1px solid #ddd' }}>
+                    <td style={{ padding: '12px' }}>{project.title}</td>
+                    <td style={{ padding: '12px' }}>{project.subtitle}</td>
+                    <td style={{ padding: '12px' }}>
+                      {Array.isArray(project.technologies) 
+                        ? project.technologies.join(', ') 
+                        : project.technologies}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <input
+                        type="checkbox"
+                        checked={project.featured}
+                        onChange={(e) => toggleFeatured(project._id, e.target.checked)}
+                      />
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <button onClick={() => handleEdit(project._id)}>Edit</button>
+                      <button onClick={() => handleDelete(project._id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
