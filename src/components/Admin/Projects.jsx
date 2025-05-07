@@ -12,11 +12,10 @@ const Projects = () => {
   const [editingId, setEditingId] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [rawData, setRawData] = useState([]); // initial empty array
 
-  // API base URL
   const API_BASE = `${import.meta.env.VITE_BASE_URL}project`;
 
-  // Fetch all projects on component mount
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -25,7 +24,8 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get`);
-      setProjects(response.data);
+      setProjects(response.data.projects);
+      setRawData([]); // fallback
     } catch (error) {
       message.error('Failed to fetch projects');
       console.error('Error fetching projects:', error);
@@ -101,10 +101,8 @@ const Projects = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      
       const formData = new FormData();
-      
-      // Append all required fields
+
       formData.append('title', values.title);
       formData.append('subtitle', values.subtitle);
       formData.append('description', values.description);
@@ -112,8 +110,7 @@ const Projects = () => {
       formData.append('featured', values.featured || false);
       formData.append('githubUrl', values.githubUrl);
       formData.append('liveDemoUrl', values.liveDemoUrl);
-      
-      // Append image file if exists
+
       if (fileList[0]?.originFileObj) {
         formData.append('image', fileList[0].originFileObj);
       }
@@ -154,23 +151,29 @@ const Projects = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/get/${id}`);
-      const project = response.data;
-      
+      const project = response.data.projects;
+
       if (project) {
         form.setFieldsValue({
           ...project,
           technologies: project.technologies || [],
+          featured: project.featured || false,
+          githubUrl: project.githubUrl || '',
           liveDemoUrl: project.liveDemoUrl || ''
         });
+
         setEditingId(id);
+
         if (project.imageUrl) {
+          const imageUrl = new URL(`/public${project.imageUrl}`, import.meta.env.VITE_BASE_URL.replace('/api/v1/', '/')).toString();
           setFileList([{
             uid: '-1',
             name: 'current-image',
             status: 'done',
-            url: `${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}`,
+            url: imageUrl,
           }]);
         }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -192,11 +195,10 @@ const Projects = () => {
         try {
           setLoading(true);
           const response = await axios.delete(`${API_BASE}/delete/${id}`);
-          
+
           if (response.status === 200 || response.status === 204) {
             message.success('Project deleted successfully');
-            // Update UI immediately
-            setProjects(prevProjects => prevProjects.filter(project => project._id !== id));
+            setProjects(prev => prev.filter(p => p._id !== id));
           } else {
             throw new Error('Failed to delete project');
           }
@@ -206,10 +208,7 @@ const Projects = () => {
         } finally {
           setLoading(false);
         }
-      },
-      onCancel: () => {
-        console.log('Delete cancelled');
-      },
+      }
     });
   };
 
@@ -229,7 +228,7 @@ const Projects = () => {
         >
           <Input placeholder="Enter project title" />
         </Form.Item>
-        
+
         <Form.Item 
           label="Project Subtitle" 
           name="subtitle"
@@ -237,7 +236,7 @@ const Projects = () => {
         >
           <Input placeholder="Enter project subtitle" />
         </Form.Item>
-        
+
         <Form.Item 
           label="Description" 
           name="description"
@@ -245,7 +244,7 @@ const Projects = () => {
         >
           <TextArea rows={4} placeholder="Enter project description" />
         </Form.Item>
-        
+
         <Form.Item 
           label="Technologies" 
           name="technologies"
@@ -254,11 +253,11 @@ const Projects = () => {
           <Select
             mode="tags"
             style={{ width: '100%' }}
-            placeholder="Add technologies (press enter to add)"
+            placeholder="Add technologies"
             tokenSeparators={[',', ' ']}
           />
         </Form.Item>
-        
+
         <Form.Item 
           label="Featured Project" 
           name="featured"
@@ -266,14 +265,13 @@ const Projects = () => {
         >
           <Switch checkedChildren="Yes" unCheckedChildren="No" />
         </Form.Item>
-        
-        <Form.Item label="Project Image" name="imageUrl" hidden>
-          <Input />
-        </Form.Item>
-        
-        <Form.Item label="Project Image">
+
+        <Form.Item 
+          label="Project Image"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
+        >
           <Upload
-            name="image"
             listType="picture-card"
             fileList={fileList}
             onChange={({ fileList }) => setFileList(fileList)}
@@ -289,7 +287,7 @@ const Projects = () => {
             )}
           </Upload>
         </Form.Item>
-        
+
         <Form.Item 
           label="GitHub URL" 
           name="githubUrl"
@@ -297,7 +295,7 @@ const Projects = () => {
         >
           <Input placeholder="https://github.com/username/project" />
         </Form.Item>
-        
+
         <Form.Item 
           label="Live Project URL" 
           name="liveDemoUrl"
@@ -305,14 +303,10 @@ const Projects = () => {
         >
           <Input placeholder="https://yourproject.com" />
         </Form.Item>
-        
+
         <Form.Item>
           <Space>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading}
-            >
+            <Button type="primary" htmlType="submit" loading={loading}>
               {editingId ? 'Update Project' : 'Add Project'}
             </Button>
             {editingId && (
@@ -326,21 +320,8 @@ const Projects = () => {
 
       <div style={{ marginTop: 32 }}>
         <h2>Your Projects</h2>
-        <Table 
-          columns={columns} 
-          dataSource={projects} 
-          rowKey="_id"
-          loading={loading}
-          pagination={{ 
-            pageSize: 5,
-            showSizeChanger: false,
-            hideOnSinglePage: true
-          }}
-          locale={{
-            emptyText: 'No projects found'
-          }}
-          scroll={{ x: true }}
-        />
+        <Table dataSource={Array.isArray(projects) ? rawData : []} columns={columns} />
+
       </div>
     </div>
   );

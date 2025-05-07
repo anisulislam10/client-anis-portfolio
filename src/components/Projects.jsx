@@ -10,7 +10,7 @@ const [project, setproject] = useState()
   useEffect(() => {
     const fetchData=async()=>{
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`)
-      setproject(response.data)
+      setproject(response.data.projects)
 
     }
     fetchData()
@@ -88,6 +88,9 @@ const [project, setproject] = useState()
   alt={project.title}
   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
 />
+{
+  console.log("image----",`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${project.imageUrl}` )
+}
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4 flex flex-wrap gap-2">
                   {project.technologies.slice(0, 3).map((tech, i) => (
