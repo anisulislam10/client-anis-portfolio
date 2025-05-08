@@ -62,7 +62,7 @@ const Blog = () => {
             viewport={{ once: true }}
             className="text-xl text-gray-300 max-w-3xl mx-auto"
           >
-            Discover cutting-edge tutorials, industry insights, and development best practices from our experts.
+            Discover cutting-edge tutorials, industry insights, and development best practices from experts.
           </motion.p>
           
           <motion.div 
