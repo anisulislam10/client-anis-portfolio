@@ -205,13 +205,7 @@ const AllBlogs = () => {
               className="group relative overflow-hidden rounded-2xl bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:border-emerald-400/30 shadow-xl hover:shadow-emerald-400/10 transition-all"
             >
               <div className="relative h-60 overflow-hidden">
-                <motion.img 
-                  src={`${import.meta.env.VITE_BASE_URL.replace('/api/v1/', '')}/public${post.imageUrl}`}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                />
+               
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4">
                   <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-emerald-400 bg-gray-900/80 rounded-full backdrop-blur-sm">
