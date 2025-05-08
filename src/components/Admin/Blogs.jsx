@@ -219,52 +219,35 @@ const Blogs = () => {
   value={formData.description}
   onEditorChange={handleEditorChange}
   init={{
-    height: 400,
-    menubar: false, // Simplified interface
+    height: 500,
+    menubar: 'file edit view insert format tools table help', // Single menubar definition
     plugins: [
-      'advlist autolink lists link image charmap preview anchor',
+      'advlist autolink lists link image charmap print preview anchor',
       'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table paste help wordcount',
-      'quickbars' // For better mobile support
+      'insertdatetime media table paste code help wordcount',
+      'emoticons quickbars codesample',
+      'hr pagebreak nonbreaking toc'
     ],
-    toolbar: 'undo redo | ' +
-      'bold italic underline | alignleft aligncenter alignright | ' +
-      'bullist numlist outdent indent | link image media | ' +
-      'removeformat help',
-    // Image configuration
+    toolbar: 'undo redo | formatselect | ' +
+      'bold italic underline strikethrough | forecolor backcolor | ' +
+      'alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist outdent indent | removeformat | ' +
+      'link image media table emoticons codesample | ' +
+      'hr pagebreak nonbreaking toc | help',
+    
+    // Rest of your configuration remains the same...
     image_title: true,
     automatic_uploads: true,
-    images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+    images_upload_handler: (blobInfo, progress) => new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
-        resolve(reader.result); // Returns base64 string
-      };
-      reader.onerror = () => {
-        reject('Image upload failed');
+        resolve(reader.result);
       };
       reader.readAsDataURL(blobInfo.blob());
     }),
-    // Media configuration
-    media_live_embeds: true,
-    media_url_resolver: function (data, resolve, reject) {
-      // Support YouTube, Vimeo, and local files
-      if (/youtube\.com|vimeo\.com/.test(data.url)) {
-        resolve({
-          html: `<div class="video-container">
-            <iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>
-          </div>`,
-          placeholder: true
-        });
-      } else if (data.url.startsWith('data:')) {
-        // Handle base64 videos (not recommended for large files)
-        resolve({
-          html: `<video controls><source src="${data.url}" type="video/mp4"></video>`
-        });
-      } else {
-        reject('Only YouTube/Vimeo URLs are supported');
-      }
-    },
-    // File picker for both images and videos
+    
+    // File picker configuration
+    file_picker_types: 'image media',
     file_picker_callback: (callback, value, meta) => {
       const input = document.createElement('input');
       input.setAttribute('type', 'file');
@@ -286,43 +269,103 @@ const Blogs = () => {
       
       input.click();
     },
-    // Mobile-friendly setup
-    mobile: {
-      menubar: true,
-      toolbar: [
-        'undo redo | bold italic underline',
-        'alignleft aligncenter alignright',
-        'bullist numlist outdent indent',
-        'link image media'
-      ]
+    
+    // Media embedding
+    media_live_embeds: true,
+    media_alt_source: false,
+    media_poster: false,
+    media_url_resolver: function (data, resolve, reject) {
+      // Support for YouTube, Vimeo, etc.
+      if (/youtube\.com|youtu\.be|vimeo\.com/.test(data.url)) {
+        const embedHtml = `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
+        resolve({ html: embedHtml });
+      } else {
+        reject('Unsupported media URL');
+      }
     },
+    
+    // Advanced formatting options
+    style_formats: [
+      { title: 'Headings', items: [
+        { title: 'Heading 1', format: 'h1' },
+        { title: 'Heading 2', format: 'h2' },
+        { title: 'Heading 3', format: 'h3' },
+        { title: 'Heading 4', format: 'h4' },
+        { title: 'Heading 5', format: 'h5' },
+        { title: 'Heading 6', format: 'h6' }
+      ]},
+      { title: 'Inline', items: [
+        { title: 'Bold', icon: 'bold', format: 'bold' },
+        { title: 'Italic', icon: 'italic', format: 'italic' },
+        { title: 'Underline', icon: 'underline', format: 'underline' },
+        { title: 'Strikethrough', icon: 'strikethrough', format: 'strikethrough' },
+        { title: 'Superscript', icon: 'superscript', format: 'superscript' },
+        { title: 'Subscript', icon: 'subscript', format: 'subscript' },
+        { title: 'Code', icon: 'code', format: 'code' }
+      ]},
+      { title: 'Blocks', items: [
+        { title: 'Paragraph', format: 'p' },
+        { title: 'Blockquote', format: 'blockquote' },
+        { title: 'Div', format: 'div' },
+        { title: 'Pre', format: 'pre' }
+      ]},
+      { title: 'Alignment', items: [
+        { title: 'Left', icon: 'alignleft', format: 'alignleft' },
+        { title: 'Center', icon: 'aligncenter', format: 'aligncenter' },
+        { title: 'Right', icon: 'alignright', format: 'alignright' },
+        { title: 'Justify', icon: 'alignjustify', format: 'alignjustify' }
+      ]}
+    ],
+    
     // Content styles
     content_style: `
       body { 
-        font-family: Helvetica, Arial, sans-serif; 
+        font-family: Arial, sans-serif; 
         font-size: 14px;
-        line-height: 1.4;
+        line-height: 1.6;
+        color: #333;
         margin: 1rem;
       }
       img { max-width: 100%; height: auto; }
-      .video-container {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
+      table { border-collapse: collapse; width: 100%; }
+      table, th, td { border: 1px solid #ddd; }
+      th, td { padding: 8px; text-align: left; }
+      blockquote { 
+        border-left: 4px solid #ddd;
+        padding-left: 1rem;
+        color: #777;
+        margin-left: 0;
       }
-      .video-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+      pre {
+        background: #f5f5f5;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      .mce-preview-object {
+        border: 1px dashed #888;
+        background: #f5f5f5;
       }
     `,
-    // Prevent content filtering that might remove images
+    
+    // Allow all content
     valid_elements: '*[*]',
-    valid_children: '+body[style]',
-    extended_valid_elements: 'img[class|src|border=0|alt|title|width|height|style]'
+    extended_valid_elements: 'img[src|alt|title|width|height|style|class],iframe[src|frameborder|allowfullscreen]',
+    allow_conditional_comments: true,
+    allow_html_in_named_anchor: true,
+    allow_script_urls: true,
+    
+    // Advanced options
+    branding: false,
+    elementpath: true,
+    resize: true,
+    statusbar: true,
+    browser_spellcheck: true,
+    contextmenu: 'link image table',
+    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
+    quickbars_insert_toolbar: 'quickimage quicktable',
+    toolbar_mode: 'sliding',
+    paste_data_images: true
   }}
 />
           </div>
