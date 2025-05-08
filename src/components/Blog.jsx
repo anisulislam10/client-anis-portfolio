@@ -10,7 +10,6 @@ const Blog = () => {
   useEffect(() => {
     const fetchData= async()=>{
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}blog/get`)
-      console.log("data...",response.data)
       setblogData(response.data)
 
 
@@ -105,7 +104,7 @@ const Blog = () => {
                 
                 </h3>
                 <div className='text-amber-50'>
-                {post?.subtitle}
+                {post.subtitle}
                 </div>
                 <p className="text-gray-300 mb-5 line-clamp-2">{post.excerpt}</p>
                 

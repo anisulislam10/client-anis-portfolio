@@ -63,7 +63,7 @@ const AllBlogs = () => {
     );
   }
 
-  if (blogData.length === 0) {
+  if (blogData?.length === 0) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
         <div className="container mx-auto max-w-4xl">
@@ -190,14 +190,14 @@ const AllBlogs = () => {
             Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Blog</span> Collection
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore cutting-edge tutorials and industry insights from our experts
+            Explore cutting-edge tutorials and industry insights from experts
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogData.map((post, index) => (
+          {blogData?.map((post, index) => (
             <motion.div
-              key={post._id}
+              key={post.slug}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -231,7 +231,7 @@ const AllBlogs = () => {
                 <p className="text-gray-300 mb-5 line-clamp-2">{post.subtitle}</p>
                 
                 <Link
-                  to={`/blog/${post._id}`}
+                  to={`/blog/${post.slug}`}
                   className="inline-flex items-center text-emerald-400 font-medium hover:text-emerald-300 transition-colors group/readmore"
                 >
                   Read More
