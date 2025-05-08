@@ -10,6 +10,7 @@ const Blog = () => {
   useEffect(() => {
     const fetchData= async()=>{
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}blog/get`)
+      console.log("data...",response.data)
       setblogData(response.data)
 
 

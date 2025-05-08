@@ -13,7 +13,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/blog/:id" element={<BlogPostPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/all-blogs" element={<AllBlogs />} />
           <Route path="/all-projects" element={<AllProject />} />
           <Route path="/admin" element={<Login />} />

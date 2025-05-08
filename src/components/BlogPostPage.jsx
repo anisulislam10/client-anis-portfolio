@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const BlogPostPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +16,7 @@ const BlogPostPage = () => {
     const fetchPost = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}blog/get/${id}`
+          `${import.meta.env.VITE_BASE_URL}blog/get/${slug}`
         );
         setPost(response.data);
       } catch (err) {
@@ -27,7 +27,7 @@ const BlogPostPage = () => {
     };
 
     fetchPost();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
