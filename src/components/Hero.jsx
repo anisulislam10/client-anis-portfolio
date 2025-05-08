@@ -9,11 +9,11 @@ const Hero = () => {
   const [isQuoteVisible, setIsQuoteVisible] = useState(true);
 
   useEffect(() => {
-    // Floating particles animation
+    // Floating particles animation (reduced count for mobile)
     const particles = document.querySelectorAll('.particle');
     animate(particles, {
-      translateY: ['0px', '-20px'],
-      opacity: [0.5, 1],
+      translateY: ['0px', '-10px'],
+      opacity: [0.3, 0.8],
       duration: 2000,
       direction: 'alternate',
       loop: true,
@@ -60,61 +60,62 @@ const Hero = () => {
   }, [quotes]);
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+    <section 
+      id="home" 
+      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden"
+      style={{ minHeight: '-webkit-fill-available' }} // Fix for mobile browsers
+    >
       {/* Floating 3D elements */}
+      {/* Background elements with reduced intensity for mobile */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-cyan-500/10 rounded-full filter blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/4 w-40 h-40 md:w-64 md:h-64 bg-emerald-500/5 rounded-full filter blur-xl md:blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-48 h-48 md:w-72 md:h-72 bg-cyan-500/5 rounded-full filter blur-xl md:blur-3xl"></div>
       </div>
 
       {/* Floating particles */}
-      {[...Array(15)].map((_, i) => (
+      {[...Array(8)].map((_, i) => (
         <div 
           key={i}
           className="particle absolute w-1 h-1 bg-white rounded-full opacity-0"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            width: `${Math.random() * 6 + 2}px`,
-            height: `${Math.random() * 6 + 2}px`
+            width: `${Math.random() * 4 + 1}px`,
+            height: `${Math.random() * 4 + 1}px`
           }}
         />
       ))}
       
       {/* Animated grid background */}
-      <div className="absolute inset-0 opacity-5 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]">
-        <div className="absolute inset-0 bg-[size:20px_20px] [background-image:linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]"></div>
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Anisul Islam</span>
-            </h1>
-          </motion.div>
-
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-0">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          {/* Name heading with responsive font sizes */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight">
+              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 block sm:inline">Anisul Islam</span>
+            </h1>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <h2 className="text-2xl md:text-3xl text-gray-300 mb-8">
-              Full Stack  <span className="font-semibold text-white">Software Developer</span> & <span className="font-semibold text-white">Coding Enthusiast</span>
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-4 md:mb-8 leading-snug">
+              Full Stack <span className="font-semibold text-white">Developer</span> & <span className="font-semibold text-white">Coding Enthusiast</span>
             </h2>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-              I craft <span className="font-medium text-emerald-400">exceptional digital experiences</span> with modern web technologies, blending beautiful design with robust functionality.
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-6 md:mb-10 max-w-2xl mx-auto leading-relaxed">
+              I craft <span className="font-medium text-emerald-400">exceptional digital experiences</span> with modern web technologies.
             </p>
           </motion.div>
 
