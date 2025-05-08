@@ -77,7 +77,7 @@ const Blog = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {displayedBlogs?.map((post, index) => (
             <motion.div
-              key={post._id}
+              key={post.slug}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -109,7 +109,7 @@ const Blog = () => {
                 <p className="text-gray-300 mb-5 line-clamp-2">{post.excerpt}</p>
                 
                 <Link
-                  to={`/blog/${post._id}`}
+                  to={`/blog/${post.slug}`}
                   className="inline-flex items-center text-emerald-400 font-medium hover:text-emerald-300 transition-colors group/readmore"
                 >
                   Read More

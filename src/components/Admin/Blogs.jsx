@@ -86,10 +86,10 @@ const Blogs = () => {
     setEditingId(null);
   };
 
-  const handleEdit = async (id) => {
+  const handleEdit = async (slug) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE}/get/${id}`);
+      const response = await axios.get(`${API_BASE}/get/${slug}`);
       const blog = response.data;
       
       if (blog) {
@@ -99,7 +99,7 @@ const Blogs = () => {
           description: blog.description,
           category: blog.category
         });
-        setEditingId(id);
+        setEditingId(slug);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -110,15 +110,15 @@ const Blogs = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (slug) => {
     if (window.confirm('Are you sure you want to delete this blog? This action cannot be undone.')) {
       try {
         setLoading(true);
-        const response = await axios.delete(`${API_BASE}/delete/${id}`);
+        const response = await axios.delete(`${API_BASE}/delete/${slug}`);
         
         if (response.data && (response.data.success || response.data.deletedCount > 0)) {
           alert('Blog deleted successfully');
-          setBlogs(prev => prev.filter(blog => blog._id !== id));
+          setBlogs(prev => prev.filter(blog => blog._id !== slug));
         } else {
           alert(response.data?.message || 'Delete operation failed');
         }
