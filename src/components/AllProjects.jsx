@@ -14,7 +14,7 @@ const AllProjects = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}project/get`);
-        setProjects(response.data.projects);
+        setProjects(response.data.data);
       } catch (err) {
         setError(err.message || 'Failed to fetch projects');
       } finally {
