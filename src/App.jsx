@@ -5,6 +5,9 @@ import AllProject from './components/AllProjects';
 import Login from './components/Admin/Login';
 import Dashboard from './components/Admin/Dashboard';  
 import BlogPostPage from './components/BlogPostPage';
+import Shop_homepage from './components/shop/Shop_homepage';
+import Shop_page from './pages/Shop/Shop_page';
+import AddToCart from './components/shop/AddToCart';
 // import ProtectedRoute from './components/Admin/ProtectedRoute';
 
 function App() {
@@ -18,6 +21,12 @@ function App() {
           <Route path="/all-projects" element={<AllProject />} />
           <Route path="/admin" element={<Login />} />
           <Route path="/super-admin/dashboard" element={<Dashboard />} />
+
+{/* shop routes */}
+
+<Route path="/shop" element={<Shop_page />} />
+<Route path="/shop/cart"  element={<AddToCart />} />
+
 
 
 

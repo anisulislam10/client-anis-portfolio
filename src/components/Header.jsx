@@ -53,8 +53,10 @@ const Header = () => {
     { id: 'about', label: 'About' },
     { id: 'skills', label: 'Skills' },
     { id: 'projects', label: 'Projects' },
+    { id: 'shop', label: 'Shop' },
     { id: 'blog', label: 'Blog' },
-    { id: 'contact', label: 'Contact' }
+    { id: 'contact', label: 'Contact' },
+
   ];
 
   return (
@@ -181,6 +183,10 @@ const Header = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </motion.a>
+
+
+
+            
           </div>
         </motion.div>
       </div>

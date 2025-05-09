@@ -6,6 +6,7 @@ import Projects from '../components/Projects';
 import Blog from '../components/Blog';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import Shop_homepage from '../components/shop/Shop_homepage';
 
 const Home = () => {
   return (
@@ -16,6 +17,7 @@ const Home = () => {
         <About />
         <Skills />
         <Projects />
+        <Shop_homepage/>
         <Blog />
         <Contact />
       </main>
