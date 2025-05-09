@@ -60,7 +60,7 @@ const Shop_page = () => {
           
           <div className="flex items-center justify-center space-x-3 text-gray-500 mb-10">
             <FiClock className="h-6 w-6 text-emerald-500" />
-            <span className="text-lg font-medium">Launching Q1 2024</span>
+            <span className="text-lg font-medium">Launching Q2 2025</span>
           </div>
           
           {/* Animated progress bar */}
