@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://custom-gpt-backend-six.vercel.app/api/chatbot/script.js" onload="console.log('script.js loaded')" onerror="console.error('Failed to load script.js')"></script>
+  <script src="https://custom-gpt-backend-six.vercel.app/api/chatbot/config.js?flowId=6830b5101267d83b58f81609&userId=6823500167e54cfebf9d44fb&primary=%236366f1&secondary=%23f59e0b&background=%23f8fafc&text=%231f2937&name=Assistant&avatar=https%3A%2F%2Fimg.freepik.com%2Ffree-vector%2Fchatbot-chat-message-vectorart_78370-4104.jpg%3Fsemt%3Dais_hybrid%26w%3D200"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.initChatbot === 'function') {
+        window.initChatbot();
+      } else {
+        console.error('initChatbot not defined');
+        document.getElementById('chatbot-container').innerHTML = `
+          <div style="padding: 20px; color: red;">
+            Error: Unable to initialize chatbot. Please try again later.
+          </div>
+        `;
+      }
+    });
+  </script>
     <title>Anisul Islam - Software Engineer</title>
     <style>
       #chatbot-container {
@@ -23,6 +39,8 @@
   </head>
   <body>
     <div id="root"></div>
+      <div id="chatbot-container" style="width: 100%; height: 100%;"></div>
+
 
     <!-- Chatbot container with embedded iframe -->
     <!-- <div id="chatbot-container">
