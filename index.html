@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
     <title>Anisul Islam - Software Engineer</title>
     <style>
       #chatbot-container {
@@ -24,14 +25,30 @@
     <div id="root"></div>
 
     <!-- Chatbot container with embedded iframe -->
-    <div id="chatbot-container">
+    <!-- <div id="chatbot-container">
       <iframe
         src="https://custom-gpt-backend-six.vercel.app/api/chatbot/6830632e1060b3f16ac6f8a1/683062a5343a736eb18cb5e3?domain=https://anisdev.vercel.app"
         allowtransparency="true"
       ></iframe>
-    </div>
+    </div> -->
 
     <!-- Load your app -->
     <script type="module" src="/src/main.jsx"></script>
+    <script src="https://custom-gpt-backend-six.vercel.app/api/chatbot/script.js"></script>
+      <script>
+        window.ChatbotConfig = {
+          flowId: "6830632e1060b3f16ac6f8a1",
+          userId: "683062a5343a736eb18cb5e3",
+          websiteDomain: "https://anisdev.vercel.app",
+          position: "bottom-right",
+          theme: {
+            primary: "#6366f1",
+            secondary: "#f59e0b",
+            background: "#ffffff",
+            text: "#1f2937"
+          }
+        };
+        window.initChatbot();
+      </script>
   </body>
 </html>
