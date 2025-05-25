@@ -25,15 +25,22 @@
   <body>
     <div id="root"></div>
     
-    
-      <iframe
-        src="https://custom-gpt-backend-eta.vercel.app/api/chatbot/68331888f43a780c0bea92f0/683062a5343a736eb18cb5e3?domain=https%3A%2F%2Fanisdev.vercel.app"
-        style="width: 400px; height: 600px; border: none; position: fixed"
-        allowtransparency="true"
-      ></iframe>
-    
-    
-
+    <script src="https://custom-gpt-backend-eta.vercel.app/api/chatbot/script.js"></script>
+      <script>
+        window.ChatbotConfig = {
+          flowId: "68331888f43a780c0bea92f0",
+          userId: "683062a5343a736eb18cb5e3",
+          websiteDomain: "https://anisdev.vercel.app",
+          position: "bottom-right",
+          theme: {
+            primary: "#4fee3a",
+            secondary: "#000000",
+            background: "#ffffff",
+            text: "#1f2937"
+          }
+        };
+        window.initChatbot();
+      </script>
     <!-- Chatbot container with embedded iframe -->
     <!-- <div id="chatbot-container">
       <iframe
