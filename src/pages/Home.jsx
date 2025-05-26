@@ -11,6 +11,18 @@ import Shop_homepage from '../components/shop/Shop_homepage';
 const Home = () => {
   return (
     <>
+    <iframe
+  src="https://custom-gpt-backend-sigma.vercel.app/api/chatbot/68348001c057079e12a2031d/683307347fb0b329f0322ea5?domain=https%3A%2F%2Fanisdev.vercel.app"
+  style={{
+    width: '400px',
+    height: '600px',
+    border: 'none',
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+  }}
+  allowTransparency="true"
+/>
       <Header />
       <main>
         <Hero />
