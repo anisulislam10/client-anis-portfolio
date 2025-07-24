@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import TopAd from './TopAd';
 
 const Hero = () => {
   const [quotes, setQuotes] = useState([]);
@@ -9,7 +10,6 @@ const Hero = () => {
   const [isQuoteVisible, setIsQuoteVisible] = useState(true);
 
   useEffect(() => {
-    // Floating particles animation (reduced count for mobile)
     const particles = document.querySelectorAll('.particle');
     animate(particles, {
       translateY: ['0px', '-10px'],
@@ -18,7 +18,7 @@ const Hero = () => {
       direction: 'alternate',
       loop: true,
       easing: 'easeInOutSine',
-      delay: stagger(200)
+      delay: stagger(200),
     });
   }, []);
 
@@ -26,7 +26,7 @@ const Hero = () => {
     const fetchQuotes = async () => {
       try {
         const response = await axios('https://dummyjson.com/quotes');
-        setQuotes(response.data.quotes); 
+        setQuotes(response.data.quotes);
       } catch (error) {
         console.error('Error fetching quotes:', error);
         setQuotes([
@@ -47,26 +47,24 @@ const Hero = () => {
 
     const interval = setInterval(() => {
       setIsQuoteVisible(false);
-      
       setTimeout(() => {
-        setCurrentQuoteIndex(prevIndex => 
-          prevIndex === quotes.length - 1 ? 0 : prevIndex + 1
+        setCurrentQuoteIndex(prev =>
+          prev === quotes.length - 1 ? 0 : prev + 1
         );
         setIsQuoteVisible(true);
-      }, 500); 
-    }, 8000); 
+      }, 500);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [quotes]);
 
   return (
-    <section 
-      id="home" 
-      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden"
-      style={{ minHeight: '-webkit-fill-available' }} // Fix for mobile browsers
+    <section
+      id="home"
+      className="relative min-h-[calc(100vh-4rem)] bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden"
+      style={{ minHeight: '-webkit-fill-available' }}
     >
-      {/* Floating 3D elements */}
-      {/* Background elements with reduced intensity for mobile */}
+      {/* Background Particles */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-40 h-40 md:w-64 md:h-64 bg-emerald-500/5 rounded-full filter blur-xl md:blur-3xl"></div>
         <div className="absolute bottom-1/3 right-1/3 w-48 h-48 md:w-72 md:h-72 bg-cyan-500/5 rounded-full filter blur-xl md:blur-3xl"></div>
@@ -74,7 +72,7 @@ const Hero = () => {
 
       {/* Floating particles */}
       {[...Array(8)].map((_, i) => (
-        <div 
+        <div
           key={i}
           className="particle absolute w-1 h-1 bg-white rounded-full opacity-0"
           style={{
@@ -82,98 +80,106 @@ const Hero = () => {
             left: `${Math.random() * 100}%`,
             width: `${Math.random() * 4 + 1}px`,
             height: `${Math.random() * 4 + 1}px`
-          }}
-        />
+          }} />
       ))}
-      
-      {/* Animated grid background */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-0">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          {/* Name heading with responsive font sizes */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight mt-22">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 block sm:inline ">Anisul Islam</span>
-            </h1>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-4 md:mb-8 leading-snug">
-              Full Stack <span className="font-semibold text-white">Developer</span> & <span className="font-semibold text-white">Coding Enthusiast</span>
-            </h2>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-6 md:mb-10 max-w-2xl mx-auto leading-relaxed">
-              I craft <span className="font-medium text-emerald-400">exceptional digital experiences</span> with modern web technologies.
-            </p>
-          </motion.div>
+      {/* Flex container to split ad and content */}
+      <div className="flex flex-row h-full w-full">
+        {/* Left - TopAd */}
+        <div className="w-[180px] pt-10 pl-4 z-20 ml-6 mt-20 ">
+          <TopAd />
+         
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="flex flex-col sm:flex-row justify-center gap-4"
-          >
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="#projects"
-              className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all flex items-center justify-center group"
-            >
-              View My Work
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </motion.a>
-            
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="#contact"
-              className="px-8 py-4 border-2 border-emerald-500 text-emerald-400 font-bold rounded-xl hover:bg-emerald-500/10 transition-all flex items-center justify-center group"
-            >
-              Let's Connect
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-            </motion.a>
-          </motion.div>
-
-          {quotes.length > 0 && (
+        {/* Right - Main Content */}
+        <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-0">
+          <div className="max-w-4xl mx-auto text-center px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
-              className={`max-w-2xl mx-auto mt-16 p-6 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 transition-all duration-500 ${isQuoteVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              transition={{ duration: 0.8 }}
             >
-              <div className="text-center">
-                <span className="inline-block mb-3 px-3 py-1 text-xs font-semibold text-emerald-400 bg-emerald-400/10 rounded-full">
-                  INSPIRATION
-                </span>
-                <blockquote className="text-xl italic text-white mb-4">
-                  "{quotes[currentQuoteIndex]?.quote}"
-                </blockquote>
-                <p className="text-emerald-400 font-medium">
-                  — {quotes[currentQuoteIndex]?.author}
-                </p>
-              </div>
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight mt-22">
+                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 block sm:inline ">Anisul Islam</span>
+              </h1>
             </motion.div>
-          )}
+
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-4 md:mb-8 leading-snug">
+                Full Stack <span className="font-semibold text-white">Developer</span> & <span className="font-semibold text-white">Coding Enthusiast</span>
+              </h2>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-6 md:mb-10 max-w-2xl mx-auto leading-relaxed">
+                I craft <span className="font-medium text-emerald-400">exceptional digital experiences</span> with modern web technologies.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="flex flex-col sm:flex-row justify-center gap-4"
+            >
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="#projects"
+                className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all flex items-center justify-center group"
+              >
+                View My Work
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </motion.a>
+
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="#contact"
+                className="px-8 py-4 border-2 border-emerald-500 text-emerald-400 font-bold rounded-xl hover:bg-emerald-500/10 transition-all flex items-center justify-center group"
+              >
+                Let's Connect
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </motion.a>
+            </motion.div>
+
+            {quotes.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.2 }}
+                className={`max-w-2xl mx-auto mt-16 p-6 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 transition-all duration-500 ${isQuoteVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              >
+                <div className="text-center">
+                  <span className="inline-block mb-3 px-3 py-1 text-xs font-semibold text-emerald-400 bg-emerald-400/10 rounded-full">
+                    INSPIRATION
+                  </span>
+                  <blockquote className="text-xl italic text-white mb-4">
+                    "{quotes[currentQuoteIndex]?.quote}"
+                  </blockquote>
+                  <p className="text-emerald-400 font-medium">
+                    — {quotes[currentQuoteIndex]?.author}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll Down Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
