@@ -9,6 +9,7 @@ import BlogPostPage from './components/BlogPostPage';
 import Shop_homepage from './components/shop/Shop_homepage';
 import Shop_page from './pages/Shop/Shop_page';
 import AddToCart from './components/shop/AddToCart';
+
 // import CheckOut from './components/shop/CheckOut';
 
 // import ProtectedRoute from './components/Admin/ProtectedRoute';
@@ -16,8 +17,11 @@ import AddToCart from './components/shop/AddToCart';
 function App() {
  
   return (
+    
     <Router>
+
       <div className="min-h-screen bg-gray-50">
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
