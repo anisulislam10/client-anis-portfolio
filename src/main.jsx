@@ -9,6 +9,7 @@ import { Analytics } from "@vercel/analytics/next"
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
+      <Analytics />
       <App />
     </Provider>
   </React.StrictMode>
