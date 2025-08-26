@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import TopAd from './TopAd';
+// import TopAd from './TopAd';
 
 const Hero = () => {
   const [quotes, setQuotes] = useState([]);
@@ -95,15 +95,15 @@ const Hero = () => {
       ))}
 
       {/* Popup Ad for sm/md */}
-      {showPopupAd && <TopAd asPopup />}
+      {/* {showPopupAd && <TopAd asPopup />} */}
 
       <div className="flex flex-col sm:flex-row h-full w-full">
         {/* Inline Ad for lg+ */}
-        {!showPopupAd && (
+        {/* {!showPopupAd && (
           <div className="w-full sm:w-[180px] pt-6 sm:pt-10 px-4 sm:pl-4 z-20 sm:ml-6 mt-4 sm:mt-20 flex justify-center">
             <TopAd />
           </div>
-        )}
+        )} */}
 
         {/* Main Content */}
         <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-10 sm:py-16 md:py-0">

@@ -125,11 +125,12 @@ const AddToCart = () => {
                   <span>${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
-              
-              <button className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium">
-                Proceed to Checkout
-              </button>
-              
+            <div className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-center">
+  <Link to="/shop/cart/checout" className="block w-full">
+    Proceed to Checkout
+  </Link>
+</div>
+
               <div className="mt-4 text-center">
                 <Link to="/#shop" className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
                   Continue Shopping

@@ -24,7 +24,11 @@ const Projects = () => {
 
   const displayedProjects = projects?.slice(0, 6);
 
- 
+  // Construct image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    return `${import.meta.env.VITE_BASE_URL}uploads/projects/${imagePath}`;
+  };
 
   if (loading) {
     return (
@@ -99,24 +103,42 @@ const Projects = () => {
               viewport={{ once: true }}
               className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-emerald-400/30 shadow-2xl shadow-black/50 hover:shadow-emerald-400/10 transition-all"
             >
-             
+              {/* Project Image */}
+              {project.projectImage && (
+                <div className="relative overflow-hidden h-48">
+                  <img 
+                    src={getImageUrl(project.projectImage)} 
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent"></div>
+                </div>
+              )}
               
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
                   {project.title}
                 </h3>
                 
-                <p className="text-gray-300 mb-5">{project.description}</p>
+                <p className="text-gray-300 mb-4 line-clamp-2">{project.description}</p>
                 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.technologies?.map((tech, index) => (
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {project.technologies?.slice(0, 3).map((tech, techIndex) => (
                     <span 
-                      key={index} 
+                      key={techIndex} 
                       className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 backdrop-blur-sm"
                     >
                       {tech}
                     </span>
                   ))}
+                  {project.technologies?.length > 3 && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 backdrop-blur-sm">
+                      +{project.technologies.length - 3} more
+                    </span>
+                  )}
                 </div>
                 
                 <div className="flex space-x-3">
