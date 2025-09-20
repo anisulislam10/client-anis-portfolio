@@ -51,7 +51,7 @@ const CheckOut = () => {
                 <h3 className="text-xl font-medium text-gray-800 mb-2">Shipping Information Saved!</h3>
                 <p className="text-gray-600 mb-6">Your shipping details have been saved successfully.</p>
                 <Link 
-                  to="/payment" 
+                  to="/shop/checkout/payment" 
                   className="inline-block px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                 >
                   Continue to Payment
@@ -180,7 +180,7 @@ const CheckOut = () => {
 
             {isSubmitted && (
               <Link
-                to="/payment"
+                to="/shop/checkout/payment"
                 className="block w-full mt-6 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-center transition-colors"
               >
                 Proceed to Payment

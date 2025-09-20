@@ -10,7 +10,8 @@ import Shop_homepage from './components/shop/Shop_homepage';
 import Shop_page from './pages/Shop/Shop_page';
 import AddToCart from './components/shop/AddToCart';
 
-// import CheckOut from './components/shop/CheckOut';
+import CheckOut from './components/shop/CheckOut';
+import Payment from './components/shop/Payment';
 
 // import ProtectedRoute from './components/Admin/ProtectedRoute';
 
@@ -33,7 +34,9 @@ function App() {
           {/* shop routes */}
           <Route path="/shop" element={<Shop_page />} />
           <Route path="/shop/cart" element={<AddToCart />} />
-          {/* <Route path="/shop/cart/checout" element={<CheckOut />} /> */}
+          <Route path="/shop/cart/checout" element={<CheckOut />} />
+          <Route path="/shop/checkout/payment" element={<Payment />} />
+
         </Routes>
       </div>
     </Router>
