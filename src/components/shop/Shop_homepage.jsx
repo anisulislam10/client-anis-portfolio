@@ -21,7 +21,7 @@ const Shop = () => {
       id: 1,
       name: 'React UI Templates',
       description: 'Beautifully designed React component templates',
-      price: 29.99,
+      price: 1000,
       image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
       category: 'digital'
     },
@@ -29,7 +29,7 @@ const Shop = () => {
       id: 2,
       name: 'JavaScript E-book',
       description: 'Comprehensive guide to modern JavaScript',
-      price: 19.99,
+      price: 2000,
       image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
       category: 'digital'
     },
@@ -37,7 +37,7 @@ const Shop = () => {
       id: 3,
       name: 'Developer Stickers',
       description: 'Set of 10 high-quality developer stickers',
-      price: 9.99,
+      price: 500,
       image: 'https://devshopbd.com/wp-content/uploads/2024/02/sticker-dsb02st02-02.png',
       category: 'merchandise'
     },
@@ -45,7 +45,7 @@ const Shop = () => {
       id: 4,
       name: 'Hoodie- "IT WORKS ON MY MACHINE"',
       description: 'Everyone needs a cozy go-to hoodie to curl up in, so go for one thats soft, smooth, and stylish. Its the perfect choice for cooler evenings!',
-      price: 14.99,
+      price: 700,
       image: 'https://developer-shop.com/cdn/shop/products/unisex-heavy-blend-hoodie-black-60094287c0f5c.jpg?v=1611219619&width=713',
       category: 'merchandise'
     },
@@ -53,7 +53,7 @@ const Shop = () => {
       id: 5,
       name: 'T-Shirt - "Developer"',
       description: '100% cotton t-shirt with a printed developer quote',
-      price: 24.99,
+      price: 1300,
       image: 'https://thepixelfashion.com/cdn/shop/files/Angular_6.png?v=1720722219&width=533',
       category: 'merchandise'
     },
@@ -61,7 +61,7 @@ const Shop = () => {
       id: 6,
       name: 'Printed Mug - "Developer"',
       description: 'Funny mug for daily debugging warriors',
-      price: 13.49,
+      price: 750,
       image: 'https://cdn.prod.website-files.com/621ce8c18852b857f473ad7b/62f9ca492008a347c7bf5470_black-glossy-mug-black-11oz-handle-on-left-62f9bb0f50500.jpg',
       category: 'merchandise'
     }
@@ -154,7 +154,7 @@ const Shop = () => {
                 <p className="text-gray-600 mb-4">{product.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-emerald-500">
-                    ${product.price.toFixed(2)}
+                    PKR: {product.price.toFixed(2)}
                   </span>
                   <motion.button
                     whileHover={{ scale: 1.05 }}

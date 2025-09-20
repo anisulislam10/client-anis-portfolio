@@ -138,7 +138,7 @@ const CheckoutForm = () => {
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            {processing ? 'Processing...' : `Pay $${Number.parseFloat(totalAmount).toFixed(2)}`}
+            {processing ? 'Processing...' : `Pay RS${Number.parseFloat(totalAmount).toFixed(2)}`}
           </button>
         </form>
       )}
