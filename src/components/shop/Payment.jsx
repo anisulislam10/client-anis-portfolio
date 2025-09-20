@@ -29,7 +29,7 @@ const CheckoutForm = () => {
       return;
     }
 
-    fetch('https://server-anis-portfolio.vercel.app/api/v1/payment/create-payment-intent', {
+    fetch(`${import.meta.env.VITE_BASE_URL}payment/create-payment-intent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
