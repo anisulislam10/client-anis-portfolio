@@ -67,7 +67,7 @@ const AddToCart = () => {
                   <div className="flex-grow">
                     <div className="flex justify-between">
                       <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
-                      <p className="text-lg font-semibold text-emerald-600">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-lg font-semibold text-emerald-600">PKR {(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                     <p className="text-gray-500 mt-1">{item.category}</p>
                     <p className="text-gray-600 mt-2">{item.description}</p>
@@ -107,22 +107,22 @@ const AddToCart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${totalAmount.toFixed(2)}</span>
+                  <span className="font-medium">PKR {totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">PKR 0.00</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">PKR 0.00</span>
                 </div>
               </div>
               
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${totalAmount.toFixed(2)}</span>
+                  <span>PKR {totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             <div className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-center">

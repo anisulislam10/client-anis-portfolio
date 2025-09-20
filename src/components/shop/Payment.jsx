@@ -69,8 +69,9 @@ const CheckoutForm = () => {
       payment_method: {
         card: cardElement,
         billing_details: {
-          name: 'Test Customer',
-        },
+name: customerName,  // 👈 use actual name
+      email: customerEmail,
+            },
       },
     });
 
@@ -138,7 +139,7 @@ const CheckoutForm = () => {
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            {processing ? 'Processing...' : `Pay RS${Number.parseFloat(totalAmount).toFixed(2)}`}
+            {processing ? 'Processing...' : `Pay RS ${Number.parseFloat(totalAmount).toFixed(2)}`}
           </button>
         </form>
       )}

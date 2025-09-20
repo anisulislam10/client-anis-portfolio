@@ -1,10 +1,36 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // only if using react-router
 import { motion } from 'framer-motion';
 import { FiClock, FiShoppingBag, FiMail, FiInstagram, FiTwitter } from 'react-icons/fi';
 
 const Shop_page = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6 overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 overflow-hidden">
+
+      {/* --- Menu bar --- */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+          <h1 className="text-xl font-bold text-emerald-600">AnisDev</h1>
+          <div className="space-x-6">
+            {/* Home button (goes to home page) */}
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
+            >
+              Home
+            </Link>
+
+            {/* Shop button (scrolls to #shop on this page) */}
+            <a
+              href="#shop"
+              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
+            >
+              Shop
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -21,11 +47,13 @@ const Shop_page = () => {
         ></motion.div>
       </div>
 
+      {/* Shop Section */}
       <motion.div 
+        id="shop"
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, type: 'spring' }}
-        className="max-w-lg w-full bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20"
+        className="max-w-lg mx-auto mt-28 bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20"
       >
         {/* Header with animated gradient */}
         <div className="relative h-2 bg-gradient-to-r from-emerald-400 to-purple-500 overflow-hidden">
