@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // Initialize Stripe with your test mode publishable key
-const stripePromise = loadStripe('sk_test_51QG1tVBMpvCO65tHnymjHCyzKjzprGnA4GbyCjHprfhYWwqFw8JqRaNAD2WKKJ7jQEUVnzRa6qzWqo0pYB8ae3gW00VtFfR7WX'); // Replace with your Stripe test publishable key
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -21,19 +21,37 @@ const CheckoutForm = () => {
   const [succeeded, setSucceeded] = useState(false);
   const [clientSecret, setClientSecret] = useState('');
 
-  // Fetch client secret from your backend (PaymentIntent)
   useEffect(() => {
-    // Replace with your backend endpoint
+    // Ensure totalAmount is a number with two decimal places
+    const amountInCents = Math.round(Number.parseFloat(totalAmount).toFixed(2) * 100);
+    if (isNaN(amountInCents) || amountInCents <= 0) {
+      setError('Invalid cart amount');
+      return;
+    }
+
     fetch('https://server-anis-portfolio.vercel.app/api/v1/payment/create-payment-intent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount: Math.round(totalAmount * 100) }), // Amount in cents
+      body: JSON.stringify({ amount: amountInCents }),
     })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret))
-      .catch((err) => setError('Failed to initialize payment'));
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        setClientSecret(data.clientSecret);
+      })
+      .catch((err) => {
+        console.error('Fetch error:', err);
+        setError(`Failed to initialize payment: ${err.message}`);
+      });
   }, [totalAmount]);
 
   const handleSubmit = async (event) => {
@@ -52,7 +70,7 @@ const CheckoutForm = () => {
       payment_method: {
         card: cardElement,
         billing_details: {
-          name: 'Test Customer', // You can pull this from your checkout form data
+          name: 'Test Customer',
         },
       },
     });
@@ -121,7 +139,7 @@ const CheckoutForm = () => {
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            {processing ? 'Processing...' : `Pay $${totalAmount.toFixed(2)}`}
+            {processing ? 'Processing...' : `Pay $${Number.parseFloat(totalAmount).toFixed(2)}`}
           </button>
         </form>
       )}
