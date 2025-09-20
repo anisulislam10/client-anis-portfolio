@@ -69,9 +69,8 @@ const CheckoutForm = () => {
       payment_method: {
         card: cardElement,
         billing_details: {
-name: customerName,  // 👈 use actual name
-      email: customerEmail,
-            },
+          name: 'Test Customer',
+        },
       },
     });
 
