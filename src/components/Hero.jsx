@@ -68,7 +68,7 @@ const Hero = () => {
       </div>
 
       {/* Main Content Container */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-20">
         <div className="text-center">
           
           {/* Professional Status Indicator */}
