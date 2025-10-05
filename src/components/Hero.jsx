@@ -1,339 +1,166 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Hero = () => {
-  const [text, setText] = useState('');
+  const [displayText, setDisplayText] = useState('');
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [currentTech, setCurrentTech] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  const technologies = [
-    'Full Stack Engineer',
-    'React.js Specialist',
-    'Node.js Expert',
-    'TypeScript Engineer',
-    'MongoDB Engineer',
-    'Next.js Engineer',
-    'Express.js Engineer'
+  const roles = [
+    'Senior Full Stack Engineer',
+    'React & Next.js Specialist',
+    'Node.js & TypeScript Expert',
+    'Software Architecture'
   ];
 
+  // Initialize animations
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        setMousePosition({
-          x: (e.clientX - rect.left - rect.width / 2) / rect.width,
-          y: (e.clientY - rect.top - rect.height / 2) / rect.height
-        });
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    setIsVisible(true);
   }, []);
 
+  // Typing and backspace effect
   useEffect(() => {
-    const currentWord = technologies[currentTech];
-    const typingSpeed = isDeleting ? 40 : 80;
+    const currentRole = roles[currentRoleIndex];
+    const typingSpeed = isDeleting ? 50 : 100;
+    const pauseTime = isDeleting ? 500 : 2000;
 
     const timer = setTimeout(() => {
-      if (!isDeleting && text === currentWord) {
-        setTimeout(() => setIsDeleting(true), 2000);
-      } else if (isDeleting && text === '') {
+      if (!isDeleting && displayText === currentRole) {
+        // Pause at full text, then start deleting
+        setTimeout(() => setIsDeleting(true), pauseTime);
+      } else if (isDeleting && displayText === '') {
+        // Finished deleting, move to next role
         setIsDeleting(false);
-        setCurrentTech((prev) => (prev + 1) % technologies.length);
+        setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
       } else {
-        setText(isDeleting ? currentWord.substring(0, text.length - 1) : currentWord.substring(0, text.length + 1));
+        // Typing or deleting
+        setDisplayText(
+          isDeleting 
+            ? currentRole.substring(0, displayText.length - 1)
+            : currentRole.substring(0, displayText.length + 1)
+        );
       }
     }, typingSpeed);
 
     return () => clearTimeout(timer);
-  }, [text, isDeleting, currentTech, technologies]);
-
-  useEffect(() => {
-    const canvas = document.getElementById('particleCanvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let particles = [];
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        size: Math.random() * 2.5 + 0.5,
-        opacity: Math.random() * 0.6 + 0.3,
-        hue: Math.random() * 60 + 160
-      });
-    }
-
-    const animate = () => {
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.08)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
-        gradient.addColorStop(0, `hsla(${p.hue}, 80%, 60%, ${p.opacity})`);
-        gradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        particles.forEach((p2, j) => {
-          if (i < j) {
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 100) {
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              const avgHue = (p.hue + p2.hue) / 2;
-              ctx.strokeStyle = `hsla(${avgHue}, 70%, 60%, ${0.2 * (1 - dist / 100)})`;
-              ctx.lineWidth = 1;
-              ctx.stroke();
-            }
-          }
-        });
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [displayText, isDeleting, currentRoleIndex, roles]);
 
   return (
     <section
-      ref={heroRef}
       id="home"
-      className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center"
+      className="relative min-h-screen bg-slate-950 overflow-hidden flex items-center justify-center"
     >
-      <canvas id="particleCanvas" className="absolute inset-0"></canvas>
-
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div 
-          className="absolute top-1/4 -left-32 w-[700px] h-[700px] rounded-full blur-[150px] animate-float opacity-40"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%)',
-            transform: `translate(${mousePosition.x * 80}px, ${mousePosition.y * 80}px)`,
-            transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-          }}
-        />
-        <div 
-          className="absolute bottom-1/4 -right-32 w-[700px] h-[700px] rounded-full blur-[150px] animate-float-delayed opacity-40"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(6,182,212,0.4) 0%, transparent 70%)',
-            transform: `translate(${mousePosition.x * -50}px, ${mousePosition.y * -50}px)`,
-            transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-          }}
-        />
-        <div 
-          className="absolute top-1/2 left-1/2 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse-slow opacity-30"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(168,85,247,0.35) 0%, transparent 70%)',
-            transform: `translate(-50%, -50%) translate(${mousePosition.x * 60}px, ${mousePosition.y * 60}px)`,
-            transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-          }}
-        />
+      {/* Premium Background */}
+      <div className="absolute inset-0">
+        {/* Sophisticated gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900" />
+        
+        {/* Subtle texture */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.02)_0%,transparent_70%)]" />
       </div>
 
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_50%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_100%)] pointer-events-none" />
+      {/* Professional Accent Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-1 h-24 bg-white/10" />
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-1 bg-white/10" />
+        <div className="absolute top-1/3 right-1/3 w-0.5 h-16 bg-white/5" />
+        <div className="absolute bottom-1/3 left-1/3 w-16 h-0.5 bg-white/5" />
+      </div>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-7xl mx-auto">
+      {/* Main Content Container */}
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-8">
+        <div className="text-center">
           
-          <div className="flex justify-center mb-16 animate-fade-in">
-            <div className="inline-flex items-center gap-4 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-blue-500/5 border border-emerald-400/20 backdrop-blur-xl shadow-2xl shadow-emerald-500/5 hover:shadow-emerald-500/10 transition-all duration-500 group">
-              <div className="relative flex items-center justify-center">
-                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-ping absolute opacity-75" />
-                <div className="w-3 h-3 bg-emerald-400 rounded-full shadow-lg shadow-emerald-400/50" />
+          {/* Professional Status Indicator */}
+          <div className={`flex justify-center  transition-all duration-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-lg backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-sm font-medium text-gray-300 tracking-wider uppercase">
+                  Currently Available
+                </span>
               </div>
-              <span className="text-sm font-bold text-emerald-300 tracking-[0.25em] group-hover:tracking-[0.3em] transition-all duration-300">
-                AVAILABLE FOR WORK
-              </span>
-              <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
             </div>
           </div>
 
-          <div className="text-center mb-20 space-y-10">
-            <div className="relative inline-block animate-fade-in-up">
-              <h1 className="text-8xl sm:text-9xl lg:text-[5rem] font-black tracking-[-0.02em] leading-[0.9] mb-4">
-                <span className="relative inline-block group">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 via-cyan-300 to-emerald-400 drop-shadow-5xl animate-gradient-x">
-                    ANISUL
-                  </span>
-                  <div className="absolute inset-0 blur-3xl opacity-50 bg-gradient-to-br from-emerald-400 to-cyan-400 -z-10 group-hover:opacity-70 transition-opacity duration-500" />
-                </span>
-                <br />
-                <span className="relative inline-block group">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-br from-cyan-300 via-blue-400 to-purple-400 drop-shadow-2xl animate-gradient-x-reverse">
-                    ISLAM
-                  </span>
-                  <div className="absolute inset-0 blur-3xl opacity-50 bg-gradient-to-br from-cyan-400 to-purple-400 -z-10 group-hover:opacity-70 transition-opacity duration-500" />
-                </span>
+          {/* Executive Name Display */}
+          <div className={`mb-16 transition-all duration-800 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
+            <div className="space-y-4">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-tight">
+                Anisul Islam
               </h1>
+              <div className="w-24 h-0.5 bg-white/20 mx-auto" />
             </div>
+          </div>
 
-            <div className="h-10 flex items-center justify-center animate-fade-in-up" style={{ animationDelay: '150ms' }}>
-              <div className="relative group">
-                <h2 className="text-5xl sm:text-6xl lg:text-4xl font-bold tracking-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 drop-shadow-lg">
-                    {text}
-                  </span>
-                  <span className="text-cyan-300 animate-cursor ml-1">|</span>
-                </h2>
-                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-3xl -z-10 opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-              </div>
+          {/* Professional Role Display with Typing Effect */}
+          <div className={`mb-16 transition-all duration-800 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
+            <div className="h-12 flex items-center justify-center">
+              <h2 className="text-2xl text-gray-400 font-light tracking-wide min-h-[2rem]">
+                {displayText}
+                <span className="ml-1 text-emerald-400 animate-pulse">|</span>
+              </h2>
             </div>
+          </div>
 
-            <p className="text-2xl sm:text-3xl lg:text-4xl text-gray-300 max-w-5xl mx-auto leading-relaxed animate-fade-in-up font-light" style={{ animationDelay: '300ms' }}>
-              Architecting{' '}
-              <span className="relative inline-block group">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-300 font-semibold">
-                  extraordinary digital experiences
-                </span>
-                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-400 to-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-              </span>
-              {' '}with modern technologies
+          {/* Professional Value Proposition */}
+          <div className={`mb-20 transition-all duration-800 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed font-light">
+              Delivering enterprise-grade solutions through modern architecture 
+              and exceptional engineering craftsmanship.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 animate-fade-in-up" style={{ animationDelay: '450ms' }}>
+          {/* Executive Action Buttons */}
+          <div className={`flex flex-col sm:flex-row items-center justify-center gap-6 transition-all duration-800 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
             <a
-              href="#projects"
-              className="group relative px-14 py-7 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 text-white font-black text-xl rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500 shadow-[0_20px_60px_-15px_rgba(6,182,212,0.5)] hover:shadow-[0_25px_80px_-15px_rgba(6,182,212,0.7)]"
+              href="#portfolio"
+              className="group px-10 py-4 bg-white text-slate-900 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center gap-3 shadow-xl hover:shadow-2xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 skew-x-12" />
-              <span className="relative z-10 flex items-center gap-4 tracking-wide">
-                VIEW MY WORK
-                <svg className="h-7 w-7 transition-transform group-hover:translate-x-2 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
+              <span>View Portfolio</span>
+              <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
 
             <a
-              href="#about"
-              className="group relative px-14 py-7 border-2 border-cyan-400/50 text-cyan-300 font-black text-xl rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500 backdrop-blur-sm hover:border-cyan-400 hover:bg-cyan-500/5"
+              href="#contact"
+              className="group px-10 py-4 border border-white/30 text-white font-semibold rounded-lg hover:border-white/50 hover:bg-white/5 transition-all duration-300 flex items-center gap-3"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:via-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500" />
-              <span className="relative z-10 flex items-center gap-4 tracking-wide">
-                ABOUT ME
-                <svg className="h-7 w-7 transition-transform group-hover:rotate-12 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </span>
+              <span>Start Conversation</span>
+              <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
             </a>
+          </div>
+
+          {/* Professional Metrics */}
+          <div className={`grid grid-cols-3 gap-8 max-w-2xl mx-auto mt-20 transition-all duration-800 delay-1100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="text-center">
+              <div className="text-2xl font-light text-white mb-1">2+</div>
+              <div className="text-sm text-gray-500 uppercase tracking-wider">Years Experience</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-light text-white mb-1">50+</div>
+              <div className="text-sm text-gray-500 uppercase tracking-wider">Projects Delivered</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-light text-white mb-1">100%</div>
+              <div className="text-sm text-gray-500 uppercase tracking-wider">Client Satisfaction</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-
-        @keyframes gradient-x-reverse {
-          0%, 100% { background-position: 100% 50%; }
-          50% { background-position: 0% 50%; }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-40px) scale(1.05); }
-        }
-
-        @keyframes float-delayed {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-35px) scale(1.05); }
-        }
-
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.1); }
-        }
-
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes fade-in-up {
-          from { 
-            opacity: 0; 
-            transform: translateY(40px); 
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-
-        @keyframes cursor {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
-        }
-
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 5s ease infinite;
-        }
-
-        .animate-gradient-x-reverse {
-          background-size: 200% 200%;
-          animation: gradient-x-reverse 5s ease infinite;
-        }
-
-        .animate-float {
-          animation: float 10s ease-in-out infinite;
-        }
-
-        .animate-float-delayed {
-          animation: float-delayed 10s ease-in-out infinite;
-          animation-delay: 2s;
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 5s ease-in-out infinite;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 1.2s ease-out forwards;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          opacity: 0;
-        }
-
-        .animate-cursor {
-          animation: cursor 1s step-start infinite;
-        }
-      `}</style>
+      {/* Executive Scroll Indicator */}
+      <div className={`absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-all duration-800 delay-1300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="flex flex-col items-center space-y-3">
+          <span className="text-xs text-gray-500 font-medium tracking-widest">EXPLORE PORTFOLIO</span>
+          <div className="w-px h-12 bg-gray-600">
+            <div className="w-px h-6 bg-white/80 animate-pulse" />
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
